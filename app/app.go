@@ -346,6 +346,14 @@ func NewEthermintApp(
 		app.GetSubspace(banktypes.ModuleName),
 		app.BlockedAddrs(),
 	)
+	// bankKeeper := bankkeeper.NewBaseKeeper(
+	// 	appCodec,
+	// 	keys[banktypes.StoreKey],
+	// 	app.AccountKeeper,
+	// 	app.GetSubspace(banktypes.ModuleName),
+	// 	app.BlockedAddrs(),
+	// )
+	// app.BankKeeper = &bankKeeper
 	stakingKeeper := stakingkeeper.NewKeeper(
 		appCodec, keys[stakingtypes.StoreKey],
 		app.AccountKeeper,
