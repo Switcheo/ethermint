@@ -82,8 +82,8 @@ The pass backend requires GnuPG: https://gnupg.org/
 }
 
 func runAddCmd(cmd *cobra.Command, args []string) error {
-	buf := bufio.NewReader(cmd.InOrStdin())
 	clientCtx := client.GetClientContextFromCmd(cmd)
+	buf := bufio.NewReader(clientCtx.Input)
 
 	var (
 		kr  keyring.Keyring
