@@ -178,8 +178,10 @@ func (b *Backend) GetBalance(address common.Address, blockNrOrHash rpctypes.Bloc
 	if val.IsNegative() {
 		return nil, errors.New("couldn't fetch balance. Node state is pruned")
 	}
+	//Balance stepped up to show correctly on metamask
+	steppedUpBalance := val.Mul(sdkmath.NewIntFromBigInt(evmtypes.DefaultStepUpDownRatio))
 
-	return (*hexutil.Big)(val.BigInt()), nil
+	return (*hexutil.Big)(steppedUpBalance.BigInt()), nil
 }
 
 // GetTransactionCount returns the number of transactions at the given address up to the given block number.

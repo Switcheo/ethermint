@@ -209,6 +209,19 @@ func (k *Keeper) ApplyTransaction(ctx sdk.Context, tx *ethtypes.Transaction) (*t
 		return nil, sdkerrors.Wrap(err, "failed to return ethereum transaction as core message")
 	}
 
+	// create new msg to stepdown msg value and msg fee
+	msg = ethtypes.NewMessage(msg.From(),
+		msg.To(),
+		msg.Nonce(),
+		new(big.Int).Div(msg.Value(), types.DefaultStepUpDownRatio),
+		msg.Gas(),
+		new(big.Int).Div(msg.GasPrice(), types.DefaultStepUpDownRatio),
+		new(big.Int).Div(msg.GasFeeCap(), types.DefaultStepUpDownRatio),
+		new(big.Int).Div(msg.GasTipCap(), types.DefaultStepUpDownRatio),
+		msg.Data(),
+		msg.AccessList(),
+		msg.IsFake())
+
 	// snapshot to contain the tx processing and post processing in same scope
 	var commit func()
 	tmpCtx := ctx

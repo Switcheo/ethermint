@@ -58,8 +58,9 @@ func (k Keeper) DeductTxCostsFromUserBalance(
 	feeMktParams := k.feeMarketKeeper.GetParams(ctx)
 	if london && feeMktParams.IsBaseFeeEnabled(ctx.BlockHeight()) && txData.TxType() == ethtypes.DynamicFeeTxType {
 		baseFee := k.feeMarketKeeper.GetBaseFee(ctx)
-		if txData.GetGasFeeCap().Cmp(baseFee) < 0 {
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "the tx gasfeecap is lower than the tx baseFee: %s (gasfeecap), %s (basefee) ", txData.GetGasFeeCap(), baseFee)
+		steppedDownGasFeeCap := new(big.Int).Div(txData.GetGasFeeCap(), evmtypes.DefaultStepUpDownRatio)
+		if steppedDownGasFeeCap.Cmp(baseFee) < 0 {
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrInsufficientFee, "the steppedDown tx gasfeecap is lower than the tx baseFee: %s (steppedDownGasFeeCap), %s (basefee) ", steppedDownGasFeeCap, baseFee)
 		}
 		feeAmt = txData.EffectiveFee(baseFee)
 	} else {

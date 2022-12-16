@@ -257,25 +257,31 @@ func (tx DynamicFeeTx) Validate() error {
 
 // Fee returns gasprice * gaslimit.
 func (tx DynamicFeeTx) Fee() *big.Int {
-	return fee(tx.GetGasFeeCap(), tx.GasLimit)
+	steppedDownMaxFee := new(big.Int).Div(tx.GasFeeCap.BigInt(), DefaultStepUpDownRatio)
+	return fee(steppedDownMaxFee, tx.GasLimit)
 }
 
 // Cost returns amount + gasprice * gaslimit.
 func (tx DynamicFeeTx) Cost() *big.Int {
-	return cost(tx.Fee(), tx.GetValue())
+	steppedDownValue := new(big.Int).Div(tx.GetValue(), DefaultStepUpDownRatio)
+	return cost(tx.Fee(), steppedDownValue)
 }
 
 // GetEffectiveGasPrice returns the effective gas price
+// Base Fee stepped up to accommodate to metamask
 func (tx *DynamicFeeTx) GetEffectiveGasPrice(baseFee *big.Int) *big.Int {
-	return math.BigMin(new(big.Int).Add(tx.GasTipCap.BigInt(), baseFee), tx.GasFeeCap.BigInt())
+	steppedUpBaseFee := new(big.Int).Mul(baseFee, DefaultStepUpDownRatio)
+	return math.BigMin(new(big.Int).Add(tx.GasTipCap.BigInt(), steppedUpBaseFee), tx.GasFeeCap.BigInt())
 }
 
 // EffectiveFee returns effective_gasprice * gaslimit.
 func (tx DynamicFeeTx) EffectiveFee(baseFee *big.Int) *big.Int {
-	return fee(tx.GetEffectiveGasPrice(baseFee), tx.GasLimit)
+	steppedDownEffectiveGasPrice := new(big.Int).Div(tx.GetEffectiveGasPrice(baseFee), DefaultStepUpDownRatio)
+	return fee(steppedDownEffectiveGasPrice, tx.GasLimit)
 }
 
 // EffectiveCost returns amount + effective_gasprice * gaslimit.
 func (tx DynamicFeeTx) EffectiveCost(baseFee *big.Int) *big.Int {
-	return cost(tx.EffectiveFee(baseFee), tx.GetValue())
+	steppedDownValue := new(big.Int).Div(tx.GetValue(), DefaultStepUpDownRatio)
+	return cost(tx.EffectiveFee(baseFee), steppedDownValue)
 }

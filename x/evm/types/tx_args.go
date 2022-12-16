@@ -224,6 +224,18 @@ func (args *TransactionArgs) ToMessage(globalGasCap uint64, baseFee *big.Int) (e
 	}
 
 	msg := ethtypes.NewMessage(addr, args.To, nonce, value, gas, gasPrice, gasFeeCap, gasTipCap, data, accessList, true)
+	// create new msg to stepdown msg value and msg fee
+	msg = ethtypes.NewMessage(msg.From(),
+		msg.To(),
+		msg.Nonce(),
+		new(big.Int).Div(msg.Value(), DefaultStepUpDownRatio),
+		msg.Gas(),
+		new(big.Int).Div(msg.GasPrice(), DefaultStepUpDownRatio),
+		new(big.Int).Div(msg.GasFeeCap(), DefaultStepUpDownRatio),
+		new(big.Int).Div(msg.GasTipCap(), DefaultStepUpDownRatio),
+		msg.Data(),
+		msg.AccessList(),
+		msg.IsFake())
 	return msg, nil
 }
 

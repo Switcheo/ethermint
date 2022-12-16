@@ -193,12 +193,15 @@ func (tx LegacyTx) Validate() error {
 
 // Fee returns gasprice * gaslimit.
 func (tx LegacyTx) Fee() *big.Int {
-	return fee(tx.GetGasPrice(), tx.GetGas())
+	steppedDownGasPrice := new(big.Int).Div(tx.GetGasPrice(), DefaultStepUpDownRatio)
+	return fee(steppedDownGasPrice, tx.GetGas())
 }
 
 // Cost returns amount + gasprice * gaslimit.
 func (tx LegacyTx) Cost() *big.Int {
-	return cost(tx.Fee(), tx.GetValue())
+	steppedDownValue := new(big.Int).Div(tx.GetValue(), DefaultStepUpDownRatio)
+	return cost(tx.Fee(), steppedDownValue)
+
 }
 
 // EffectiveFee is the same as Fee for LegacyTx

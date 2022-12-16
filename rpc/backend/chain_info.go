@@ -208,7 +208,12 @@ func (b *Backend) FeeHistory(
 		}
 
 		// copy
-		thisBaseFee[index] = (*hexutil.Big)(oneFeeHistory.BaseFee)
+		// Base fee stepped up to show correctly on metamask
+		if baseFee := oneFeeHistory.BaseFee; baseFee != nil {
+			thisBaseFee[index] = (*hexutil.Big)(new(big.Int).Mul(oneFeeHistory.BaseFee, evmtypes.DefaultStepUpDownRatio))
+		} else {
+			thisBaseFee[index] = (*hexutil.Big)(oneFeeHistory.BaseFee)
+		}
 		thisGasUsedRatio[index] = oneFeeHistory.GasUsedRatio
 		if calculateRewards {
 			for j := 0; j < rewardCount; j++ {

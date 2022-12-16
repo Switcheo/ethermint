@@ -288,9 +288,13 @@ func (ctd CanTransferDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate 
 		stateDB := statedb.New(ctx, ctd.evmKeeper, statedb.NewEmptyTxConfig(common.BytesToHash(ctx.HeaderHash().Bytes())))
 		evm := ctd.evmKeeper.NewEVM(ctx, coreMsg, cfg, evmtypes.NewNoOpTracer(), stateDB)
 
+		//SteppedDownValue to pass balance check
+		txData, err := evmtypes.UnpackTxData(msgEthTx.Data)
+		steppedDownValue := new(big.Int).Div(txData.GetValue(), evmtypes.DefaultStepUpDownRatio)
+
 		// check that caller has enough balance to cover asset transfer for **topmost** call
 		// NOTE: here the gas consumed is from the context with the infinite gas meter
-		if coreMsg.Value().Sign() > 0 && !evm.Context.CanTransfer(stateDB, coreMsg.From(), coreMsg.Value()) {
+		if coreMsg.Value().Sign() > 0 && !evm.Context.CanTransfer(stateDB, coreMsg.From(), steppedDownValue) {
 			return ctx, sdkerrors.Wrapf(
 				sdkerrors.ErrInsufficientFunds,
 				"failed to transfer %s from address %s using the EVM block context transfer function",
@@ -306,11 +310,14 @@ func (ctd CanTransferDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate 
 					"base fee is supported but evm block context value is nil",
 				)
 			}
+			//SteppedDownMaxFee to pass fee check
+			steppedDownMaxFee := new(big.Int).Div(coreMsg.GasFeeCap(), evmtypes.DefaultStepUpDownRatio)
+
 			if coreMsg.GasFeeCap().Cmp(baseFee) < 0 {
 				return ctx, sdkerrors.Wrapf(
 					sdkerrors.ErrInsufficientFee,
 					"max fee per gas less than block base fee (%s < %s)",
-					coreMsg.GasFeeCap(), baseFee,
+					steppedDownMaxFee, baseFee,
 				)
 			}
 		}
