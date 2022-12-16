@@ -1,6 +1,8 @@
 package server
 
 import (
+	"fmt"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
 
@@ -103,5 +105,6 @@ func StartJSONRPC(ctx *server.Context, clientCtx client.Context, tmRPCAddr, tmEn
 	tmWsClient = ConnectTmWS(tmRPCAddr, tmEndpoint, ctx.Logger)
 	wsSrv := rpc.NewWebsocketsServer(clientCtx, ctx.Logger, tmWsClient, config)
 	wsSrv.Start()
+	logrus.Info(fmt.Sprintf("EVM JSON RPC started"))
 	return httpSrv, httpSrvDone, nil
 }
