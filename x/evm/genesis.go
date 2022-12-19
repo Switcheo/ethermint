@@ -60,6 +60,17 @@ func InitGenesis(
 		for _, storage := range account.Storage {
 			k.SetState(ctx, address, common.HexToHash(storage.Key), common.HexToHash(storage.Value).Bytes())
 		}
+		for ethAddr, cosmosAddr := range data.EthToCosmosAddressMap {
+			ethAddrBz := sdk.MustAccAddressFromBech32(ethAddr)
+			cosmosAddrBz := sdk.MustAccAddressFromBech32(cosmosAddr)
+			accountKeeper.AddToEthToCosmosAddressMap(ctx, ethAddrBz, cosmosAddrBz)
+		}
+
+		for cosmosAddr, ethAddr := range data.CosmosToEthAddressMap {
+			ethAddrBz := sdk.MustAccAddressFromBech32(ethAddr)
+			cosmosAddrBz := sdk.MustAccAddressFromBech32(cosmosAddr)
+			accountKeeper.AddToCosmosToEthAddressMap(ctx, cosmosAddrBz, ethAddrBz)
+		}
 	}
 
 	return []abci.ValidatorUpdate{}
@@ -68,6 +79,8 @@ func InitGenesis(
 // ExportGenesis exports genesis state of the EVM module
 func ExportGenesis(ctx sdk.Context, k *keeper.Keeper, ak types.AccountKeeper) *types.GenesisState {
 	var ethGenAccounts []types.GenesisAccount
+	cosmosToEthAddressMap := make(map[string]string)
+	ethToCosmosAddressMap := make(map[string]string)
 	ak.IterateAccounts(ctx, func(account authtypes.AccountI) bool {
 		ethAccount, ok := account.(ethermint.EthAccountI)
 		if !ok {
@@ -89,8 +102,18 @@ func ExportGenesis(ctx sdk.Context, k *keeper.Keeper, ak types.AccountKeeper) *t
 		return false
 	})
 
+	ak.IterateCosmosToEthAddressMapping(ctx, func(cosmosAddress, ethAddress sdk.AccAddress) bool {
+		cosmosToEthAddressMap[cosmosAddress.String()] = ethAddress.String()
+		return false
+	})
+	ak.IterateEthToCosmosAddressMapping(ctx, func(ethAddress, cosmosAddress sdk.AccAddress) bool {
+		ethToCosmosAddressMap[ethAddress.String()] = cosmosAddress.String()
+		return false
+	})
 	return &types.GenesisState{
-		Accounts: ethGenAccounts,
-		Params:   k.GetParams(ctx),
+		Accounts:              ethGenAccounts,
+		Params:                k.GetParams(ctx),
+		EthToCosmosAddressMap: ethToCosmosAddressMap,
+		CosmosToEthAddressMap: cosmosToEthAddressMap,
 	}
 }
