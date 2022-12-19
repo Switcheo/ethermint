@@ -284,7 +284,7 @@ func (suite *AnteTestSuite) CreateTestEIP712CosmosTxBuilder(
 	accNumber := suite.app.AccountKeeper.GetAccount(suite.ctx, from).GetAccountNumber()
 
 	data := legacytx.StdSignBytes(chainId, accNumber, nonce, 0, fee, []sdk.Msg{msg}, "")
-	typedData, err := eip712.WrapTxToTypedData(ethermintCodec, ethChainId, msg, data, &eip712.FeeDelegationOptions{
+	typedData, err := eip712.WrapTxToTypedData(suite.ctx, ethermintCodec, ethChainId, msg, data, &eip712.FeeDelegationOptions{
 		FeePayer: from,
 	})
 	suite.Require().NoError(err)
