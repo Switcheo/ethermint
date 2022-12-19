@@ -206,6 +206,12 @@ func (s *StateDB) getStateObject(addr common.Address) *stateObject {
 	if obj := s.stateObjects[addr]; obj != nil {
 		return obj
 	}
+
+	// Return corresponding address stateObject if available
+	corrAddr := s.keeper.GetCorrespondingAddressIfExists(s.ctx, addr)
+	if corrAddr != nil && s.stateObjects[common.BytesToAddress(corrAddr)] != nil {
+		return s.stateObjects[common.BytesToAddress(corrAddr)]
+	}
 	// If no live objects are available, load it from keeper
 	account := s.keeper.GetAccount(s.ctx, addr)
 	if account == nil {
