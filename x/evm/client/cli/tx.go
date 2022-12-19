@@ -26,6 +26,8 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 	cmd.AddCommand(NewRawTxCmd())
+	cmd.AddCommand(CmdMergeAccount())
+
 	return cmd
 }
 
