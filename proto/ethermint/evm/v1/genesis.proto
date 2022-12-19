@@ -12,6 +12,16 @@ message GenesisState {
   repeated GenesisAccount accounts = 1 [ (gogoproto.nullable) = false ];
   // params defines all the parameters of the module.
   Params params = 2 [ (gogoproto.nullable) = false ];
+  // eth-cosmos mapping from account keeper
+  map<string, string> eth_to_cosmos_address_map = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"eth_to_cosmos_address_map\""
+  ];
+  // cosmos-eth mapping from account keeper
+  map<string, string> cosmos_to_eth_address_map = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"cosmos_to_eth_address_map\""
+  ];
 }
 
 // GenesisAccount defines an account to be initialized in the genesis state.
