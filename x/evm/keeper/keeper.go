@@ -20,7 +20,7 @@ import (
 	"github.com/evmos/ethermint/x/evm/types"
 )
 
-var EvmChainId string = "ethermint_9000-1"
+var EvmChainId string
 
 // Keeper grants access to the EVM module state and implements the go-ethereum StateDB interface.
 type Keeper struct {
