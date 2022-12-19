@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	ethermint "github.com/evmos/ethermint/types"
 )
@@ -18,16 +19,20 @@ func (ga GenesisAccount) Validate() error {
 // chain config values.
 func DefaultGenesisState() *GenesisState {
 	return &GenesisState{
-		Accounts: []GenesisAccount{},
-		Params:   DefaultParams(),
+		Accounts:              []GenesisAccount{},
+		Params:                DefaultParams(),
+		EthToCosmosAddressMap: make(map[string]string),
+		CosmosToEthAddressMap: make(map[string]string),
 	}
 }
 
 // NewGenesisState creates a new genesis state.
-func NewGenesisState(params Params, accounts []GenesisAccount) *GenesisState {
+func NewGenesisState(params Params, accounts []GenesisAccount, ethToCosmosAddressMap, cosmosToEthAddressMap map[string]string) *GenesisState {
 	return &GenesisState{
-		Accounts: accounts,
-		Params:   params,
+		Accounts:              accounts,
+		Params:                params,
+		EthToCosmosAddressMap: ethToCosmosAddressMap,
+		CosmosToEthAddressMap: cosmosToEthAddressMap,
 	}
 }
 
@@ -44,6 +49,43 @@ func (gs GenesisState) Validate() error {
 		}
 		seenAccounts[acc.Address] = true
 	}
+	if err := gs.Params.Validate(); err != nil {
+		return err
+	}
 
-	return gs.Params.Validate()
+	return gs.validateAddressMapping()
+}
+
+func (gs GenesisState) validateAddressMapping() error {
+	if err := validateAddressMap(gs.CosmosToEthAddressMap); err != nil {
+		return err
+	}
+	return validateAddressMap(gs.EthToCosmosAddressMap)
+}
+
+func validateAddressMap(addressMap map[string]string) error {
+	seenAddressValue := make(map[string]bool)
+
+	for key, value := range addressMap {
+		if seenAddressValue[value] {
+			return fmt.Errorf("duplicated address value: %s", value)
+		}
+		if key == value {
+			return fmt.Errorf("found same address for key and value in address mapping. key: %s, value: %s", key, value)
+		}
+		_, err := sdk.AccAddressFromBech32(key)
+		if err != nil {
+			return fmt.Errorf("unable to convert address key to bech32, key:%s : %w", key, err)
+
+		}
+		_, err = sdk.AccAddressFromBech32(value)
+		if err != nil {
+			return fmt.Errorf("unable to convert address value to bech32, key:%s : %w", value, err)
+
+		}
+		seenAddressValue[value] = true
+
+	}
+
+	return nil
 }
