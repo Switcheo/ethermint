@@ -132,5 +132,8 @@ func (k *Keeper) EthereumTx(goCtx context.Context, msg *types.MsgEthereumTx) (*t
 
 func (k *Keeper) MergeAccount(goCtx context.Context, msg *types.MsgMergeAccount) (*types.MsgMergeAccountResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	return k.MergeUserAccount(ctx, msg)
+	if err := k.MergeUserAccount(ctx, msg); err != nil {
+		return nil, err
+	}
+	return &types.MsgMergeAccountResponse{}, nil
 }
