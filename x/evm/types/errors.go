@@ -34,6 +34,10 @@ const (
 	codeErrGasOverflow
 	codeErrInvalidAccount
 	codeErrInvalidGasLimit
+	//MsgMergeAccount Errors
+	codeErrInvalidCreatorAddress
+	codeErrInvalidPubKey
+	codeErrAccountMerged
 )
 
 var ErrPostTxProcessing = errors.New("failed to execute post processing")
@@ -101,6 +105,17 @@ var (
 
 	// ErrInvalidGasLimit returns an error if gas limit value is invalid
 	ErrInvalidGasLimit = sdkerrors.Register(ModuleName, codeErrInvalidGasLimit, "invalid gas limit")
+)
+
+//MsgMergeAccount Errors
+var (
+	// ErrInvalidCreatorAddress returns an error for an invalid creator address
+	ErrInvalidCreatorAddress = sdkerrors.Register(ModuleName, codeErrInvalidCreatorAddress, "creator address must be bech32")
+
+	// ErrInvalidPubKey returns an error for an invalid public key given
+	ErrInvalidPubKey = sdkerrors.Register(ModuleName, codeErrInvalidPubKey, "public key should be in hex")
+
+	ErrAccountMerged = sdkerrors.Register(ModuleName, codeErrAccountMerged, "account has already been merged")
 )
 
 // NewExecErrorWithReason unpacks the revert return bytes and returns a wrapped error
