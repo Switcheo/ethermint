@@ -1,7 +1,9 @@
 package ante
 
 import (
+	"bytes"
 	"fmt"
+	cosmossecp256k1 "github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -18,7 +20,6 @@ import (
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 	"github.com/evmos/ethermint/ethereum/eip712"
 	ethermint "github.com/evmos/ethermint/types"
-	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
 var ethermintCodec codec.ProtoCodecMarshaler
@@ -34,13 +35,16 @@ func init() {
 //
 // CONTRACT: Pubkeys are set in context for all signers before this decorator runs
 // CONTRACT: Tx must implement SigVerifiableTx interface
+// Customisation:
+// 1. pubKey type to change to eth type(ethsecp256k1) should there be an eth signature + cosmos signer msg
+// 2. To allow eth signature + cosmos signer to pass the feepayer check
 type Eip712SigVerificationDecorator struct {
-	ak              evmtypes.AccountKeeper
+	ak              AccountKeeper
 	signModeHandler authsigning.SignModeHandler
 }
 
 // NewEip712SigVerificationDecorator creates a new Eip712SigVerificationDecorator
-func NewEip712SigVerificationDecorator(ak evmtypes.AccountKeeper, signModeHandler authsigning.SignModeHandler) Eip712SigVerificationDecorator {
+func NewEip712SigVerificationDecorator(ak AccountKeeper, signModeHandler authsigning.SignModeHandler) Eip712SigVerificationDecorator {
 	return Eip712SigVerificationDecorator{
 		ak:              ak,
 		signModeHandler: signModeHandler,
@@ -124,6 +128,15 @@ func (svd Eip712SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx,
 
 	if simulate {
 		return next(ctx, tx, simulate)
+	}
+
+	//if is eth signature + cosmos address(signer), convert pubkey from cosmos type to be eth type to allow signature verification to pass
+	if ethsecp256k1.KeyType == sig.PubKey.Type() {
+		cosmosPubKeyBz := cosmossecp256k1.PubKey{Key: sig.PubKey.Bytes()}
+		correspondingCosmosAddrBz := cosmosPubKeyBz.Address().Bytes()
+		if bytes.Equal(correspondingCosmosAddrBz, signerAddrs[i].Bytes()) {
+			pubKey = &ethsecp256k1.PubKey{Key: pubKey.Bytes()}
+		}
 	}
 
 	if err := VerifySignature(ctx, pubKey, signerData, sig.Data, svd.signModeHandler, authSignTx); err != nil {
@@ -256,7 +269,9 @@ func VerifySignature(
 
 		recoveredFeePayerAcc := sdk.AccAddress(pk.Address().Bytes())
 
-		if !recoveredFeePayerAcc.Equals(feePayer) {
+		cosmosPubkey := cosmossecp256k1.PubKey{Key: pk.Bytes()}
+		//Allow eth signature + cosmos signer(also the fee payer) to bypass this check
+		if !recoveredFeePayerAcc.Equals(feePayer) && !bytes.Equal(cosmosPubkey.Address().Bytes(), feePayer.Bytes()) {
 			return sdkerrors.Wrapf(sdkerrors.ErrorInvalidSigner, "failed to verify delegated fee payer %s signature", recoveredFeePayerAcc)
 		}
 

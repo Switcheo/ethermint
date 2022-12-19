@@ -29,6 +29,7 @@ type EVMKeeper interface {
 	GetBalance(ctx sdk.Context, addr common.Address) *big.Int
 	ResetTransientGasUsed(ctx sdk.Context)
 	GetTxIndexTransient(ctx sdk.Context) uint64
+	AccountHasAlreadyBeenMerged(ctx sdk.Context, address sdk.AccAddress, isEthAddress bool) bool
 }
 
 type protoTxProvider interface {
@@ -42,7 +43,9 @@ type FeeMarketKeeper interface {
 }
 
 type AccountKeeper interface {
+	GetParams(ctx sdk.Context) (params types.Params)
 	GetAccount(ctx sdk.Context, addr sdk.AccAddress) types.AccountI
 	SetAccount(ctx sdk.Context, acc types.AccountI)
+	GetModuleAddress(moduleName string) sdk.AccAddress
 	NewAccountWithAddress(ctx sdk.Context, addr sdk.AccAddress) types.AccountI
 }
