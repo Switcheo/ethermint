@@ -218,8 +218,5 @@ func (k Keeper) GetCorrespondingAddressIfExists(ctx sdk.Context, addr common.Add
 	if corrAddr := k.accountKeeper.GetCorrespondingCosmosAddressIfExists(ctx, addr.Bytes()); corrAddr != nil {
 		return corrAddr
 	}
-	if corrAddr := k.accountKeeper.GetCorrespondingEthAddressIfExists(ctx, addr.Bytes()); corrAddr != nil {
-		return corrAddr
-	}
-	return nil
+	return k.accountKeeper.GetCorrespondingEthAddressIfExists(ctx, addr.Bytes())
 }
