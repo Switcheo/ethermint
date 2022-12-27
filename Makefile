@@ -66,6 +66,7 @@ PROJECT_DIR=github.com/evmos/ethermint
 
 ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=ethermint \
 		  -X '${PROJECT_DIR}/x/evm/keeper.EvmChainId=ethermint_9000-1' \
+		   -X '${PROJECT_DIR}/x/evm/types.DefaultEVMDenom=aphoton' \
 		  -X github.com/cosmos/cosmos-sdk/version.AppName=$(ETHERMINT_BINARY) \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \

@@ -573,13 +573,14 @@ func (suite *EvmTestSuite) TestERC20TransferReverted() {
 			suite.Require().NoError(err)
 
 			nonce := k.GetNonce(suite.ctx, suite.from)
+			steppedUpGasPrice := new(big.Int).Mul(big.NewInt(1), types.DefaultStepUpDownRatio)
 			tx := types.NewTx(
 				suite.chainID,
 				nonce,
 				&contract,
 				big.NewInt(0),
 				tc.gasLimit,
-				big.NewInt(1),
+				steppedUpGasPrice,
 				nil,
 				nil,
 				data,
@@ -591,7 +592,7 @@ func (suite *EvmTestSuite) TestERC20TransferReverted() {
 
 			txData, err := types.UnpackTxData(tx.Data)
 			suite.Require().NoError(err)
-			_, err = k.DeductTxCostsFromUserBalance(suite.ctx, *tx, txData, "aphoton", true, true, true)
+			_, err = k.DeductTxCostsFromUserBalance(suite.ctx, *tx, txData, types.DefaultEVMDenom, true, true, true)
 			suite.Require().NoError(err)
 
 			res, err := k.EthereumTx(sdk.WrapSDKContext(suite.ctx), tx)

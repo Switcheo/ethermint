@@ -3,6 +3,9 @@ package keeper_test
 import (
 	"encoding/json"
 	"fmt"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/evmos/ethermint/tests"
+	types2 "github.com/evmos/ethermint/x/feemarket/types"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -10,7 +13,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	ethlogger "github.com/ethereum/go-ethereum/eth/tracers/logger"
-	ethparams "github.com/ethereum/go-ethereum/params"
 	"github.com/evmos/ethermint/x/evm/statedb"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -23,6 +25,69 @@ import (
 
 // Not valid Ethereum address
 const invalidAddress = "0x0000"
+
+func (suite *KeeperTestSuite) TestMergedAccountsAddressMappings() {
+	var (
+		request *types.QueryMergedAccountsMappingRequest
+	)
+
+	testCases := []struct {
+		msg       string
+		malleate  func()
+		expPass   bool
+		passCheck func(*types.QueryMergedAccountsMappingResponse)
+	}{
+		{
+			"get Merged Accounts address should be what is stored in the account keeper",
+			func() {
+				suite.app.AccountKeeper.SetCorrespondingAddresses(suite.ctx, tests.Maker1, tests.Maker2)
+			},
+			true,
+			func(response *types.QueryMergedAccountsMappingResponse) {
+				ethCosmosMap := suite.app.AccountKeeper.Store(suite.ctx, authtypes.EthAddressToCosmosAddressKey)
+				cosmosEthMap := suite.app.AccountKeeper.Store(suite.ctx, authtypes.CosmosAddressToEthAddressKey)
+
+				itr := ethCosmosMap.Iterator(nil, nil)
+				defer itr.Close()
+				var ethCosmosMapSize int
+				for ; itr.Valid(); itr.Next() {
+					ethCosmosMapSize++
+				}
+
+				itr2 := cosmosEthMap.Iterator(nil, nil)
+				defer itr2.Close()
+				var cosmosEthMapSize int
+				for ; itr2.Valid(); itr2.Next() {
+					cosmosEthMapSize++
+				}
+				suite.Require().Equal(cosmosEthMapSize, len(response.CosmosToEthAddressMap))
+				suite.Require().Equal(ethCosmosMapSize, len(response.EthToCosmosAddressMap))
+
+				suite.Require().Equal(sdk.AccAddress(ethCosmosMap.Get(tests.Maker1)).String(), response.EthToCosmosAddressMap[tests.Maker1.String()])
+				suite.Require().Equal(sdk.AccAddress(cosmosEthMap.Get(tests.Maker2)).String(), response.CosmosToEthAddressMap[tests.Maker2.String()])
+
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(fmt.Sprintf("Case %s", tc.msg), func() {
+			suite.SetupTest() // reset
+
+			tc.malleate()
+			ctx := sdk.WrapSDKContext(suite.ctx)
+			res, err := suite.queryClient.MergedAccountsAddressMappings(ctx, request)
+
+			if tc.expPass {
+				suite.Require().NoError(err)
+				suite.Require().NotNil(res)
+				tc.passCheck(res)
+			} else {
+				suite.Require().Error(err)
+			}
+		})
+	}
+}
 
 func (suite *KeeperTestSuite) TestQueryAccount() {
 	var (
@@ -507,7 +572,7 @@ func (suite *KeeperTestSuite) TestEstimateGas() {
 		}, true, 21000, false},
 		// should fail, because the default From address(zero address) don't have fund
 		{"not enough balance", func() {
-			args = types.TransactionArgs{To: &common.Address{}, Value: (*hexutil.Big)(big.NewInt(100))}
+			args = types.TransactionArgs{To: &common.Address{}, Value: (*hexutil.Big)(new(big.Int).Mul(big.NewInt(100), types.DefaultStepUpDownRatio))}
 		}, false, 0, false},
 		// should success, enough balance now
 		{"enough balance", func() {
@@ -546,10 +611,10 @@ func (suite *KeeperTestSuite) TestEstimateGas() {
 			args = types.TransactionArgs{To: &common.Address{}}
 		}, true, 21000, true},
 		{"not enough balance w/ enableFeemarket", func() {
-			args = types.TransactionArgs{To: &common.Address{}, Value: (*hexutil.Big)(big.NewInt(100))}
+			args = types.TransactionArgs{To: &common.Address{}, Value: (*hexutil.Big)(new(big.Int).Mul(big.NewInt(100), types.DefaultStepUpDownRatio))}
 		}, false, 0, true},
 		{"enough balance w/ enableFeemarket", func() {
-			args = types.TransactionArgs{To: &common.Address{}, From: &suite.address, Value: (*hexutil.Big)(big.NewInt(100))}
+			args = types.TransactionArgs{To: &common.Address{}, From: &suite.address, Value: (*hexutil.Big)(new(big.Int).Mul(big.NewInt(100), types.DefaultStepUpDownRatio))}
 		}, false, 0, true},
 		{"gas exceed allowance w/ enableFeemarket", func() {
 			args = types.TransactionArgs{To: &common.Address{}, Gas: &gasHelper}
@@ -923,7 +988,7 @@ func (suite *KeeperTestSuite) TestQueryBaseFee() {
 		{
 			"pass - default Base Fee",
 			func() {
-				initialBaseFee := sdk.NewInt(ethparams.InitialBaseFee)
+				initialBaseFee := sdk.NewInt(types2.DefaultInitialBaseFee.Int64())
 				expRes = &types.QueryBaseFeeResponse{BaseFee: &initialBaseFee}
 			},
 			true, true, true,
