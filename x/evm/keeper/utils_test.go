@@ -1,23 +1,33 @@
 package keeper_test
 
 import (
+	"github.com/evmos/ethermint/x/feemarket/types"
 	"math/big"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
-	ethparams "github.com/ethereum/go-ethereum/params"
 	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
 func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 	hundredInt := sdk.NewInt(100)
+	hundredIntSteppedUp := sdk.NewIntFromBigInt(new(big.Int).Mul(hundredInt.BigInt(), evmtypes.DefaultStepUpDownRatio))
+
 	zeroInt := sdk.ZeroInt()
+
 	oneInt := sdk.OneInt()
+	oneIntSteppedUp := sdk.NewIntFromBigInt(new(big.Int).Mul(oneInt.BigInt(), evmtypes.DefaultStepUpDownRatio))
+
 	fiveInt := sdk.NewInt(5)
+	fiveIntSteppedUp := sdk.NewIntFromBigInt(new(big.Int).Mul(fiveInt.BigInt(), evmtypes.DefaultStepUpDownRatio))
+
 	fiftyInt := sdk.NewInt(50)
+	fiftyIntSteppedUp := sdk.NewIntFromBigInt(new(big.Int).Mul(fiftyInt.BigInt(), evmtypes.DefaultStepUpDownRatio))
+
 	negInt := sdk.NewInt(-10)
+	negIntSteppedUp := sdk.NewIntFromBigInt(new(big.Int).Mul(negInt.BigInt(), evmtypes.DefaultStepUpDownRatio))
 
 	testCases := []struct {
 		name            string
@@ -36,8 +46,8 @@ func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 			name:       "Enough balance",
 			to:         suite.address.String(),
 			gasLimit:   10,
-			gasPrice:   &oneInt,
-			cost:       &oneInt,
+			gasPrice:   &oneIntSteppedUp,
+			cost:       &oneIntSteppedUp,
 			from:       suite.address.String(),
 			accessList: &ethtypes.AccessList{},
 			expectPass: true,
@@ -46,8 +56,8 @@ func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 			name:       "Equal balance",
 			to:         suite.address.String(),
 			gasLimit:   99,
-			gasPrice:   &oneInt,
-			cost:       &oneInt,
+			gasPrice:   &oneIntSteppedUp,
+			cost:       &oneIntSteppedUp,
 			from:       suite.address.String(),
 			accessList: &ethtypes.AccessList{},
 			expectPass: true,
@@ -56,8 +66,8 @@ func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 			name:       "negative cost",
 			to:         suite.address.String(),
 			gasLimit:   1,
-			gasPrice:   &oneInt,
-			cost:       &negInt,
+			gasPrice:   &oneIntSteppedUp,
+			cost:       &negIntSteppedUp,
 			from:       suite.address.String(),
 			accessList: &ethtypes.AccessList{},
 			expectPass: false,
@@ -66,8 +76,8 @@ func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 			name:       "Higher gas limit, not enough balance",
 			to:         suite.address.String(),
 			gasLimit:   100,
-			gasPrice:   &oneInt,
-			cost:       &oneInt,
+			gasPrice:   &oneIntSteppedUp,
+			cost:       &oneIntSteppedUp,
 			from:       suite.address.String(),
 			accessList: &ethtypes.AccessList{},
 			expectPass: false,
@@ -76,8 +86,8 @@ func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 			name:       "Higher gas price, enough balance",
 			to:         suite.address.String(),
 			gasLimit:   10,
-			gasPrice:   &fiveInt,
-			cost:       &oneInt,
+			gasPrice:   &fiveIntSteppedUp,
+			cost:       &oneIntSteppedUp,
 			from:       suite.address.String(),
 			accessList: &ethtypes.AccessList{},
 			expectPass: true,
@@ -86,8 +96,8 @@ func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 			name:       "Higher gas price, not enough balance",
 			to:         suite.address.String(),
 			gasLimit:   20,
-			gasPrice:   &fiveInt,
-			cost:       &oneInt,
+			gasPrice:   &fiveIntSteppedUp,
+			cost:       &oneIntSteppedUp,
 			from:       suite.address.String(),
 			accessList: &ethtypes.AccessList{},
 			expectPass: false,
@@ -96,8 +106,8 @@ func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 			name:       "Higher cost, enough balance",
 			to:         suite.address.String(),
 			gasLimit:   10,
-			gasPrice:   &fiveInt,
-			cost:       &fiftyInt,
+			gasPrice:   &fiveIntSteppedUp,
+			cost:       &fiftyIntSteppedUp,
 			from:       suite.address.String(),
 			accessList: &ethtypes.AccessList{},
 			expectPass: true,
@@ -106,8 +116,8 @@ func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 			name:       "Higher cost, not enough balance",
 			to:         suite.address.String(),
 			gasLimit:   10,
-			gasPrice:   &fiveInt,
-			cost:       &hundredInt,
+			gasPrice:   &fiveIntSteppedUp,
+			cost:       &hundredIntSteppedUp,
 			from:       suite.address.String(),
 			accessList: &ethtypes.AccessList{},
 			expectPass: false,
@@ -116,8 +126,8 @@ func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 			name:            "Enough balance w/ enableFeemarket",
 			to:              suite.address.String(),
 			gasLimit:        10,
-			gasFeeCap:       big.NewInt(1),
-			cost:            &oneInt,
+			gasFeeCap:       new(big.Int).Mul(big.NewInt(1), evmtypes.DefaultStepUpDownRatio),
+			cost:            &oneIntSteppedUp,
 			from:            suite.address.String(),
 			accessList:      &ethtypes.AccessList{},
 			expectPass:      true,
@@ -127,8 +137,8 @@ func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 			name:            "Equal balance w/ enableFeemarket",
 			to:              suite.address.String(),
 			gasLimit:        99,
-			gasFeeCap:       big.NewInt(1),
-			cost:            &oneInt,
+			gasFeeCap:       new(big.Int).Mul(big.NewInt(1), evmtypes.DefaultStepUpDownRatio),
+			cost:            &oneIntSteppedUp,
 			from:            suite.address.String(),
 			accessList:      &ethtypes.AccessList{},
 			expectPass:      true,
@@ -138,8 +148,8 @@ func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 			name:            "negative cost w/ enableFeemarket",
 			to:              suite.address.String(),
 			gasLimit:        1,
-			gasFeeCap:       big.NewInt(1),
-			cost:            &negInt,
+			gasFeeCap:       new(big.Int).Mul(big.NewInt(1), evmtypes.DefaultStepUpDownRatio),
+			cost:            &negIntSteppedUp,
 			from:            suite.address.String(),
 			accessList:      &ethtypes.AccessList{},
 			expectPass:      false,
@@ -149,8 +159,8 @@ func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 			name:            "Higher gas limit, not enough balance w/ enableFeemarket",
 			to:              suite.address.String(),
 			gasLimit:        100,
-			gasFeeCap:       big.NewInt(1),
-			cost:            &oneInt,
+			gasFeeCap:       new(big.Int).Mul(big.NewInt(1), evmtypes.DefaultStepUpDownRatio),
+			cost:            &oneIntSteppedUp,
 			from:            suite.address.String(),
 			accessList:      &ethtypes.AccessList{},
 			expectPass:      false,
@@ -160,8 +170,8 @@ func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 			name:            "Higher gas price, enough balance w/ enableFeemarket",
 			to:              suite.address.String(),
 			gasLimit:        10,
-			gasFeeCap:       big.NewInt(5),
-			cost:            &oneInt,
+			gasFeeCap:       new(big.Int).Mul(big.NewInt(5), evmtypes.DefaultStepUpDownRatio),
+			cost:            &oneIntSteppedUp,
 			from:            suite.address.String(),
 			accessList:      &ethtypes.AccessList{},
 			expectPass:      true,
@@ -171,8 +181,8 @@ func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 			name:            "Higher gas price, not enough balance w/ enableFeemarket",
 			to:              suite.address.String(),
 			gasLimit:        20,
-			gasFeeCap:       big.NewInt(5),
-			cost:            &oneInt,
+			gasFeeCap:       new(big.Int).Mul(big.NewInt(5), evmtypes.DefaultStepUpDownRatio),
+			cost:            &oneIntSteppedUp,
 			from:            suite.address.String(),
 			accessList:      &ethtypes.AccessList{},
 			expectPass:      false,
@@ -182,8 +192,8 @@ func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 			name:            "Higher cost, enough balance w/ enableFeemarket",
 			to:              suite.address.String(),
 			gasLimit:        10,
-			gasFeeCap:       big.NewInt(5),
-			cost:            &fiftyInt,
+			gasFeeCap:       new(big.Int).Mul(big.NewInt(5), evmtypes.DefaultStepUpDownRatio),
+			cost:            &fiftyIntSteppedUp,
 			from:            suite.address.String(),
 			accessList:      &ethtypes.AccessList{},
 			expectPass:      true,
@@ -193,8 +203,8 @@ func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 			name:            "Higher cost, not enough balance w/ enableFeemarket",
 			to:              suite.address.String(),
 			gasLimit:        10,
-			gasFeeCap:       big.NewInt(5),
-			cost:            &hundredInt,
+			gasFeeCap:       new(big.Int).Mul(big.NewInt(5), evmtypes.DefaultStepUpDownRatio),
+			cost:            &hundredIntSteppedUp,
 			from:            suite.address.String(),
 			accessList:      &ethtypes.AccessList{},
 			expectPass:      false,
@@ -220,7 +230,7 @@ func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 			if tc.enableFeemarket {
 				gasFeeCap = tc.gasFeeCap
 				if tc.gasTipCap == nil {
-					gasTipCap = oneInt.BigInt()
+					gasTipCap = new(big.Int).Mul(big.NewInt(1), evmtypes.DefaultStepUpDownRatio)
 				} else {
 					gasTipCap = tc.gasTipCap
 				}
@@ -254,11 +264,14 @@ func (suite *KeeperTestSuite) TestDeductTxCostsFromUserBalance() {
 	hundredInt := sdk.NewInt(100)
 	zeroInt := sdk.ZeroInt()
 	oneInt := sdk.NewInt(1)
+	oneIntSteppedUp := sdk.NewIntFromBigInt(new(big.Int).Mul(oneInt.BigInt(), evmtypes.DefaultStepUpDownRatio))
 	fiveInt := sdk.NewInt(5)
+	fiveIntSteppedUp := sdk.NewIntFromBigInt(new(big.Int).Mul(fiveInt.BigInt(), evmtypes.DefaultStepUpDownRatio))
 	fiftyInt := sdk.NewInt(50)
+	fiftyIntSteppedUp := sdk.NewIntFromBigInt(new(big.Int).Mul(fiftyInt.BigInt(), evmtypes.DefaultStepUpDownRatio))
 
 	// should be enough to cover all test cases
-	initBalance := sdk.NewInt((ethparams.InitialBaseFee + 10) * 105)
+	initBalance := sdk.NewInt((types.DefaultInitialBaseFee.Int64() + 10) * 105)
 
 	testCases := []struct {
 		name            string
@@ -274,40 +287,40 @@ func (suite *KeeperTestSuite) TestDeductTxCostsFromUserBalance() {
 		{
 			name:       "Enough balance",
 			gasLimit:   10,
-			gasPrice:   &oneInt,
-			cost:       &oneInt,
+			gasPrice:   &oneIntSteppedUp,
+			cost:       &oneIntSteppedUp,
 			accessList: &ethtypes.AccessList{},
 			expectPass: true,
 		},
 		{
 			name:       "Equal balance",
 			gasLimit:   100,
-			gasPrice:   &oneInt,
-			cost:       &oneInt,
+			gasPrice:   &oneIntSteppedUp,
+			cost:       &oneIntSteppedUp,
 			accessList: &ethtypes.AccessList{},
 			expectPass: true,
 		},
 		{
 			name:       "Higher gas limit, not enough balance",
 			gasLimit:   105,
-			gasPrice:   &oneInt,
-			cost:       &oneInt,
+			gasPrice:   &oneIntSteppedUp,
+			cost:       &oneIntSteppedUp,
 			accessList: &ethtypes.AccessList{},
 			expectPass: false,
 		},
 		{
 			name:       "Higher gas price, enough balance",
 			gasLimit:   20,
-			gasPrice:   &fiveInt,
-			cost:       &oneInt,
+			gasPrice:   &fiveIntSteppedUp,
+			cost:       &oneIntSteppedUp,
 			accessList: &ethtypes.AccessList{},
 			expectPass: true,
 		},
 		{
 			name:       "Higher gas price, not enough balance",
 			gasLimit:   20,
-			gasPrice:   &fiftyInt,
-			cost:       &oneInt,
+			gasPrice:   &fiftyIntSteppedUp,
+			cost:       &oneIntSteppedUp,
 			accessList: &ethtypes.AccessList{},
 			expectPass: false,
 		},
@@ -316,8 +329,8 @@ func (suite *KeeperTestSuite) TestDeductTxCostsFromUserBalance() {
 		{
 			name:       "Higher cost, enough balance",
 			gasLimit:   100,
-			gasPrice:   &oneInt,
-			cost:       &fiftyInt,
+			gasPrice:   &oneIntSteppedUp,
+			cost:       &fiftyIntSteppedUp,
 			accessList: &ethtypes.AccessList{},
 			expectPass: true,
 		},
@@ -325,9 +338,9 @@ func (suite *KeeperTestSuite) TestDeductTxCostsFromUserBalance() {
 		{
 			name:            "Invalid gasFeeCap w/ enableFeemarket",
 			gasLimit:        10,
-			gasFeeCap:       big.NewInt(1),
-			gasTipCap:       big.NewInt(1),
-			cost:            &oneInt,
+			gasFeeCap:       new(big.Int).Mul(big.NewInt(1), evmtypes.DefaultStepUpDownRatio),
+			gasTipCap:       new(big.Int).Mul(big.NewInt(1), evmtypes.DefaultStepUpDownRatio),
+			cost:            &oneIntSteppedUp,
 			accessList:      &ethtypes.AccessList{},
 			expectPass:      false,
 			enableFeemarket: true,
@@ -335,9 +348,9 @@ func (suite *KeeperTestSuite) TestDeductTxCostsFromUserBalance() {
 		{
 			name:            "empty tip fee is valid to deduct",
 			gasLimit:        10,
-			gasFeeCap:       big.NewInt(ethparams.InitialBaseFee),
+			gasFeeCap:       new(big.Int).Mul(types.DefaultInitialBaseFee.BigInt(), evmtypes.DefaultStepUpDownRatio),
 			gasTipCap:       big.NewInt(1),
-			cost:            &oneInt,
+			cost:            &oneIntSteppedUp,
 			accessList:      &ethtypes.AccessList{},
 			expectPass:      true,
 			enableFeemarket: true,
@@ -345,8 +358,8 @@ func (suite *KeeperTestSuite) TestDeductTxCostsFromUserBalance() {
 		{
 			name:            "effectiveTip equal to gasTipCap",
 			gasLimit:        100,
-			gasFeeCap:       big.NewInt(ethparams.InitialBaseFee + 2),
-			cost:            &oneInt,
+			gasFeeCap:       new(big.Int).Mul(big.NewInt(types.DefaultInitialBaseFee.Int64()+2), evmtypes.DefaultStepUpDownRatio),
+			cost:            &oneIntSteppedUp,
 			accessList:      &ethtypes.AccessList{},
 			expectPass:      true,
 			enableFeemarket: true,
@@ -354,9 +367,9 @@ func (suite *KeeperTestSuite) TestDeductTxCostsFromUserBalance() {
 		{
 			name:            "effectiveTip equal to (gasFeeCap - baseFee)",
 			gasLimit:        105,
-			gasFeeCap:       big.NewInt(ethparams.InitialBaseFee + 1),
+			gasFeeCap:       new(big.Int).Mul(big.NewInt(types.DefaultInitialBaseFee.Int64()+2), evmtypes.DefaultStepUpDownRatio),
 			gasTipCap:       big.NewInt(2),
-			cost:            &oneInt,
+			cost:            &oneIntSteppedUp,
 			accessList:      &ethtypes.AccessList{},
 			expectPass:      true,
 			enableFeemarket: true,
@@ -427,7 +440,7 @@ func (suite *KeeperTestSuite) TestDeductTxCostsFromUserBalance() {
 					suite.Require().Equal(
 						fees,
 						sdk.NewCoins(
-							sdk.NewCoin(evmtypes.DefaultEVMDenom, tc.gasPrice.Mul(sdk.NewIntFromUint64(tc.gasLimit))),
+							sdk.NewCoin(evmtypes.DefaultEVMDenom, tc.gasPrice.Mul(sdk.NewIntFromUint64(tc.gasLimit)).Quo(sdk.NewIntFromBigInt(evmtypes.DefaultStepUpDownRatio))),
 						),
 						"valid test %d failed, fee value is wrong ", i,
 					)
