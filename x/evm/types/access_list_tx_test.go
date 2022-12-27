@@ -1,6 +1,7 @@
 package types
 
 import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"math/big"
 
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
@@ -58,6 +59,8 @@ func (suite *TxDataTestSuite) TestAccessListTxGetGasFeeCap() {
 }
 
 func (suite *TxDataTestSuite) TestAccessListTxCost() {
+	steppedUpGasPrice := sdk.NewIntFromBigInt(new(big.Int).Mul((&suite.sdkInt).BigInt(), DefaultStepUpDownRatio))
+	steppedUpAmount := sdk.NewIntFromBigInt(new(big.Int).Mul((&suite.sdkZeroInt).BigInt(), DefaultStepUpDownRatio))
 	testCases := []struct {
 		name string
 		tx   AccessListTx
@@ -66,9 +69,9 @@ func (suite *TxDataTestSuite) TestAccessListTxCost() {
 		{
 			"non-empty access list tx",
 			AccessListTx{
-				GasPrice: &suite.sdkInt,
+				GasPrice: &steppedUpGasPrice,
 				GasLimit: uint64(1),
-				Amount:   &suite.sdkZeroInt,
+				Amount:   &steppedUpAmount,
 			},
 			(&suite.sdkInt).BigInt(),
 		},
@@ -82,6 +85,9 @@ func (suite *TxDataTestSuite) TestAccessListTxCost() {
 }
 
 func (suite *TxDataTestSuite) TestAccessListTxEffectiveCost() {
+	steppedUpGasPrice := sdk.NewIntFromBigInt(new(big.Int).Mul((&suite.sdkInt).BigInt(), DefaultStepUpDownRatio))
+	steppedUpAmount := sdk.NewIntFromBigInt(new(big.Int).Mul((&suite.sdkZeroInt).BigInt(), DefaultStepUpDownRatio))
+	steppedUpBaseFee := new(big.Int).Mul((&suite.sdkInt).BigInt(), DefaultStepUpDownRatio)
 	testCases := []struct {
 		name    string
 		tx      AccessListTx
@@ -91,11 +97,11 @@ func (suite *TxDataTestSuite) TestAccessListTxEffectiveCost() {
 		{
 			"non-empty access list tx",
 			AccessListTx{
-				GasPrice: &suite.sdkInt,
+				GasPrice: &steppedUpGasPrice,
 				GasLimit: uint64(1),
-				Amount:   &suite.sdkZeroInt,
+				Amount:   &steppedUpAmount,
 			},
-			(&suite.sdkInt).BigInt(),
+			steppedUpBaseFee,
 			(&suite.sdkInt).BigInt(),
 		},
 	}
