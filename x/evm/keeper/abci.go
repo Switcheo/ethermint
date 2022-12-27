@@ -9,8 +9,8 @@ import (
 )
 
 // BeginBlock sets the sdk Context and EIP155 chain id to the Keeper.
-func (k *Keeper) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
-	k.WithChainID(ctx)
+func (k *Keeper) BeginBlock() {
+	k.WithChainID()
 }
 
 // EndBlock also retrieves the bloom filter value from the transient store and commits it to the

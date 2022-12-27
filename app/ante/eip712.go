@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	cosmossecp256k1 "github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
+	"github.com/evmos/ethermint/x/evm/keeper"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -113,7 +114,7 @@ func (svd Eip712SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx,
 
 	// retrieve signer data
 	genesis := ctx.BlockHeight() == 0
-	chainID := ctx.ChainID()
+	chainID := keeper.EvmChainId
 
 	var accNum uint64
 	if !genesis {

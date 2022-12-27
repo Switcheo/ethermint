@@ -28,7 +28,7 @@ type HandlerOptions struct {
 	MaxTxGasWanted  uint64
 }
 
-func (options HandlerOptions) validate() error {
+func (options HandlerOptions) Validate() error {
 	if options.AccountKeeper == nil {
 		return sdkerrors.Wrap(sdkerrors.ErrLogic, "account keeper is required for AnteHandler")
 	}
