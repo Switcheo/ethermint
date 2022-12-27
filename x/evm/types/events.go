@@ -21,4 +21,8 @@ const (
 
 	MetricKeyTransitionDB = "transition_db"
 	MetricKeyStaticCall   = "static_call"
+
+	//Merge account events
+	EventTypeMergeEthCosmosAccount = "ethermint.evm.v1.MergeAccountEvent"
+	AttributeNewCosmosAccCreated   = "new_cosmos_acc_created"
 )
