@@ -8,6 +8,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
+	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
 // ValidateEip712MsgDecorator
@@ -75,13 +76,13 @@ func ethSigner(signer sdk.AccAddress, pubKey cryptotypes.PubKey) bool {
 func isMergeAccountTx(msgs []sdk.Msg) (bool, error) {
 	var msgMergeAccountExists bool
 	var msgMergeAccountIndex int
-	//for i, msg := range msgs {
-	//	if _, isMsgMergeAccount := msg.(*evmtypes.MsgMergeAccount); isMsgMergeAccount {
-	//		msgMergeAccountExists = true
-	//		msgMergeAccountIndex = i
-	//		break
-	//	}
-	//}
+	for i, msg := range msgs {
+		if _, isMsgMergeAccount := msg.(*evmtypes.MsgMergeAccount); isMsgMergeAccount {
+			msgMergeAccountExists = true
+			msgMergeAccountIndex = i
+			break
+		}
+	}
 
 	if msgMergeAccountExists && msgMergeAccountIndex != 0 {
 		return true, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "a tx containing merge account msg should have it as the first msg")
