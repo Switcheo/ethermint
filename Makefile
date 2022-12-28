@@ -391,6 +391,11 @@ benchmark:
 	@go test -mod=readonly -bench=. $(PACKAGES_NOSIMULATION)
 .PHONY: benchmark
 
+
+update-mock:
+	./scripts/update_mock.sh
+.PHONY: update-mock
+
 ###############################################################################
 ###                                Linting                                  ###
 ###############################################################################
