@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	ethparams "github.com/ethereum/go-ethereum/params"
 	"github.com/evmos/ethermint/x/feemarket/types"
 )
 
@@ -44,7 +43,7 @@ func (suite *KeeperTestSuite) TestQueryBaseFee() {
 		{
 			"pass - default Base Fee",
 			func() {
-				initialBaseFee := sdk.NewInt(ethparams.InitialBaseFee)
+				initialBaseFee := types.DefaultInitialBaseFee
 				expRes = &types.QueryBaseFeeResponse{BaseFee: &initialBaseFee}
 			},
 			true,
