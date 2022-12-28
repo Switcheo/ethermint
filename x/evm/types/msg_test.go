@@ -73,6 +73,7 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_Constructor() {
 }
 
 func (suite *MsgsTestSuite) TestMsgEthereumTx_BuildTx() {
+	steppedUpGasPrice := new(big.Int).Mul(big.NewInt(1), types.DefaultStepUpDownRatio)
 	testCases := []struct {
 		name     string
 		msg      *types.MsgEthereumTx
@@ -80,12 +81,12 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_BuildTx() {
 	}{
 		{
 			"build tx - pass",
-			types.NewTx(nil, 0, &suite.to, nil, 100000, big.NewInt(1), big.NewInt(1), big.NewInt(0), []byte("test"), nil),
+			types.NewTx(nil, 0, &suite.to, nil, 100000, steppedUpGasPrice, big.NewInt(1), big.NewInt(0), []byte("test"), nil),
 			false,
 		},
 		{
 			"build tx - fail: nil data",
-			types.NewTx(nil, 0, &suite.to, nil, 100000, big.NewInt(1), big.NewInt(1), big.NewInt(0), []byte("test"), nil),
+			types.NewTx(nil, 0, &suite.to, nil, 100000, steppedUpGasPrice, big.NewInt(1), big.NewInt(0), []byte("test"), nil),
 			true,
 		},
 	}
@@ -110,6 +111,7 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_BuildTx() {
 }
 
 func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
+	hundredIntSteppedUp := new(big.Int).Mul(big.NewInt(100), types.DefaultStepUpDownRatio)
 	hundredInt := big.NewInt(100)
 	zeroInt := big.NewInt(0)
 	minusOneInt := big.NewInt(-1)
@@ -131,9 +133,9 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 		{
 			msg:        "pass with recipient - Legacy Tx",
 			to:         suite.to.Hex(),
-			amount:     hundredInt,
+			amount:     hundredIntSteppedUp,
 			gasLimit:   1000,
-			gasPrice:   hundredInt,
+			gasPrice:   hundredIntSteppedUp,
 			gasFeeCap:  nil,
 			gasTipCap:  nil,
 			expectPass: true,
@@ -141,7 +143,7 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 		{
 			msg:        "pass with recipient - AccessList Tx",
 			to:         suite.to.Hex(),
-			amount:     hundredInt,
+			amount:     hundredIntSteppedUp,
 			gasLimit:   1000,
 			gasPrice:   zeroInt,
 			gasFeeCap:  nil,
@@ -153,10 +155,10 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 		{
 			msg:        "pass with recipient - DynamicFee Tx",
 			to:         suite.to.Hex(),
-			amount:     hundredInt,
+			amount:     hundredIntSteppedUp,
 			gasLimit:   1000,
 			gasPrice:   zeroInt,
-			gasFeeCap:  hundredInt,
+			gasFeeCap:  hundredIntSteppedUp,
 			gasTipCap:  zeroInt,
 			accessList: &ethtypes.AccessList{},
 			chainID:    hundredInt,
@@ -165,9 +167,9 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 		{
 			msg:        "pass contract - Legacy Tx",
 			to:         "",
-			amount:     hundredInt,
+			amount:     hundredIntSteppedUp,
 			gasLimit:   1000,
-			gasPrice:   hundredInt,
+			gasPrice:   hundredIntSteppedUp,
 			gasFeeCap:  nil,
 			gasTipCap:  nil,
 			expectPass: true,
@@ -177,7 +179,7 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 			to:         invalidFromAddress,
 			amount:     minusOneInt,
 			gasLimit:   1000,
-			gasPrice:   hundredInt,
+			gasPrice:   hundredIntSteppedUp,
 			expectPass: false,
 		},
 		{
@@ -185,7 +187,7 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 			to:         suite.to.Hex(),
 			amount:     nil,
 			gasLimit:   1000,
-			gasPrice:   hundredInt,
+			gasPrice:   hundredIntSteppedUp,
 			gasFeeCap:  nil,
 			gasTipCap:  nil,
 			expectPass: true,
@@ -195,7 +197,7 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 			to:         suite.to.Hex(),
 			amount:     minusOneInt,
 			gasLimit:   1000,
-			gasPrice:   hundredInt,
+			gasPrice:   hundredIntSteppedUp,
 			gasFeeCap:  nil,
 			gasTipCap:  nil,
 			expectPass: false,
@@ -203,9 +205,9 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 		{
 			msg:        "zero gas limit - Legacy Tx",
 			to:         suite.to.Hex(),
-			amount:     hundredInt,
+			amount:     hundredIntSteppedUp,
 			gasLimit:   0,
-			gasPrice:   hundredInt,
+			gasPrice:   hundredIntSteppedUp,
 			gasFeeCap:  nil,
 			gasTipCap:  nil,
 			expectPass: false,
@@ -213,7 +215,7 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 		{
 			msg:        "nil gas price - Legacy Tx",
 			to:         suite.to.Hex(),
-			amount:     hundredInt,
+			amount:     hundredIntSteppedUp,
 			gasLimit:   1000,
 			gasPrice:   nil,
 			gasFeeCap:  nil,
@@ -223,7 +225,7 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 		{
 			msg:        "negative gas price - Legacy Tx",
 			to:         suite.to.Hex(),
-			amount:     hundredInt,
+			amount:     hundredIntSteppedUp,
 			gasLimit:   1000,
 			gasPrice:   minusOneInt,
 			gasFeeCap:  nil,
@@ -233,7 +235,7 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 		{
 			msg:        "zero gas price - Legacy Tx",
 			to:         suite.to.Hex(),
-			amount:     hundredInt,
+			amount:     hundredIntSteppedUp,
 			gasLimit:   1000,
 			gasPrice:   zeroInt,
 			gasFeeCap:  nil,
@@ -243,7 +245,7 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 		{
 			msg:        "invalid from address - Legacy Tx",
 			to:         suite.to.Hex(),
-			amount:     hundredInt,
+			amount:     hundredIntSteppedUp,
 			gasLimit:   1000,
 			gasPrice:   zeroInt,
 			gasFeeCap:  nil,
@@ -254,7 +256,7 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 		{
 			msg:        "out of bound gas fee - Legacy Tx",
 			to:         suite.to.Hex(),
-			amount:     hundredInt,
+			amount:     hundredIntSteppedUp,
 			gasLimit:   1000,
 			gasPrice:   exp_2_255,
 			gasFeeCap:  nil,
@@ -266,7 +268,7 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 			to:         suite.to.Hex(),
 			amount:     nil,
 			gasLimit:   1000,
-			gasPrice:   hundredInt,
+			gasPrice:   hundredIntSteppedUp,
 			gasFeeCap:  nil,
 			gasTipCap:  nil,
 			accessList: &ethtypes.AccessList{},
@@ -278,7 +280,7 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 			to:         suite.to.Hex(),
 			amount:     minusOneInt,
 			gasLimit:   1000,
-			gasPrice:   hundredInt,
+			gasPrice:   hundredIntSteppedUp,
 			gasFeeCap:  nil,
 			gasTipCap:  nil,
 			accessList: &ethtypes.AccessList{},
@@ -288,19 +290,19 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 		{
 			msg:        "zero gas limit - AccessListTx",
 			to:         suite.to.Hex(),
-			amount:     hundredInt,
+			amount:     hundredIntSteppedUp,
 			gasLimit:   0,
 			gasPrice:   zeroInt,
 			gasFeeCap:  nil,
 			gasTipCap:  nil,
 			accessList: &ethtypes.AccessList{},
-			chainID:    hundredInt,
+			chainID:    hundredIntSteppedUp,
 			expectPass: false,
 		},
 		{
 			msg:        "nil gas price - AccessListTx",
 			to:         suite.to.Hex(),
-			amount:     hundredInt,
+			amount:     hundredIntSteppedUp,
 			gasLimit:   1000,
 			gasPrice:   nil,
 			gasFeeCap:  nil,
@@ -312,7 +314,7 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 		{
 			msg:        "negative gas price - AccessListTx",
 			to:         suite.to.Hex(),
-			amount:     hundredInt,
+			amount:     hundredIntSteppedUp,
 			gasLimit:   1000,
 			gasPrice:   minusOneInt,
 			gasFeeCap:  nil,
@@ -324,19 +326,19 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 		{
 			msg:        "zero gas price - AccessListTx",
 			to:         suite.to.Hex(),
-			amount:     hundredInt,
+			amount:     hundredIntSteppedUp,
 			gasLimit:   1000,
 			gasPrice:   zeroInt,
 			gasFeeCap:  nil,
 			gasTipCap:  nil,
 			accessList: &ethtypes.AccessList{},
-			chainID:    hundredInt,
+			chainID:    hundredIntSteppedUp,
 			expectPass: true,
 		},
 		{
 			msg:        "invalid from address - AccessListTx",
 			to:         suite.to.Hex(),
-			amount:     hundredInt,
+			amount:     hundredIntSteppedUp,
 			gasLimit:   1000,
 			gasPrice:   zeroInt,
 			gasFeeCap:  nil,
@@ -349,7 +351,7 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 		{
 			msg:        "chain ID not set on AccessListTx",
 			to:         suite.to.Hex(),
-			amount:     hundredInt,
+			amount:     hundredIntSteppedUp,
 			gasLimit:   1000,
 			gasPrice:   zeroInt,
 			gasFeeCap:  nil,
@@ -361,7 +363,7 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 		{
 			msg:        "nil tx.Data - AccessList Tx",
 			to:         suite.to.Hex(),
-			amount:     hundredInt,
+			amount:     hundredIntSteppedUp,
 			gasLimit:   1000,
 			gasPrice:   zeroInt,
 			gasFeeCap:  nil,
@@ -408,10 +410,10 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasicAdvanced() {
 				msg := types.NewTxContract(
 					hundredInt,
 					1,
-					big.NewInt(10),
+					new(big.Int).Mul(big.NewInt(10), types.DefaultStepUpDownRatio),
 					100000,
-					big.NewInt(150),
-					big.NewInt(200),
+					new(big.Int).Mul(big.NewInt(150), types.DefaultStepUpDownRatio),
+					new(big.Int).Mul(big.NewInt(200), types.DefaultStepUpDownRatio),
 					nil,
 					nil,
 					nil,
@@ -427,10 +429,10 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasicAdvanced() {
 				msg := types.NewTxContract(
 					hundredInt,
 					1,
-					big.NewInt(10),
+					new(big.Int).Mul(big.NewInt(10), types.DefaultStepUpDownRatio),
 					100000,
-					big.NewInt(150),
-					big.NewInt(200),
+					new(big.Int).Mul(big.NewInt(150), types.DefaultStepUpDownRatio),
+					new(big.Int).Mul(big.NewInt(200), types.DefaultStepUpDownRatio),
 					nil,
 					nil,
 					nil,
@@ -531,37 +533,37 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_Getters() {
 	}{
 		{
 			"get fee - pass",
-			types.NewTx(suite.chainID, 0, &suite.to, nil, 50, suite.hundredBigInt, nil, nil, nil, &ethtypes.AccessList{}),
+			types.NewTx(suite.chainID, 0, &suite.to, nil, 50, new(big.Int).Mul(suite.hundredBigInt, types.DefaultStepUpDownRatio), nil, nil, nil, &ethtypes.AccessList{}),
 			ethtypes.NewEIP2930Signer(suite.chainID),
 			big.NewInt(5000),
 		},
 		{
 			"get fee - fail: nil data",
-			types.NewTx(suite.chainID, 0, &suite.to, nil, 50, suite.hundredBigInt, nil, nil, nil, &ethtypes.AccessList{}),
+			types.NewTx(suite.chainID, 0, &suite.to, nil, 50, new(big.Int).Mul(suite.hundredBigInt, types.DefaultStepUpDownRatio), nil, nil, nil, &ethtypes.AccessList{}),
 			ethtypes.NewEIP2930Signer(suite.chainID),
 			nil,
 		},
 		{
 			"get effective fee - pass",
-			types.NewTx(suite.chainID, 0, &suite.to, nil, 50, suite.hundredBigInt, nil, nil, nil, &ethtypes.AccessList{}),
+			types.NewTx(suite.chainID, 0, &suite.to, nil, 50, new(big.Int).Mul(suite.hundredBigInt, types.DefaultStepUpDownRatio), nil, nil, nil, &ethtypes.AccessList{}),
 			ethtypes.NewEIP2930Signer(suite.chainID),
 			big.NewInt(5000),
 		},
 		{
 			"get effective fee - fail: nil data",
-			types.NewTx(suite.chainID, 0, &suite.to, nil, 50, suite.hundredBigInt, nil, nil, nil, &ethtypes.AccessList{}),
+			types.NewTx(suite.chainID, 0, &suite.to, nil, 50, new(big.Int).Mul(suite.hundredBigInt, types.DefaultStepUpDownRatio), nil, nil, nil, &ethtypes.AccessList{}),
 			ethtypes.NewEIP2930Signer(suite.chainID),
 			nil,
 		},
 		{
 			"get gas - pass",
-			types.NewTx(suite.chainID, 0, &suite.to, nil, 50, suite.hundredBigInt, nil, nil, nil, &ethtypes.AccessList{}),
+			types.NewTx(suite.chainID, 0, &suite.to, nil, 50, new(big.Int).Mul(suite.hundredBigInt, types.DefaultStepUpDownRatio), nil, nil, nil, &ethtypes.AccessList{}),
 			ethtypes.NewEIP2930Signer(suite.chainID),
 			big.NewInt(50),
 		},
 		{
 			"get gas - fail: nil data",
-			types.NewTx(suite.chainID, 0, &suite.to, nil, 50, suite.hundredBigInt, nil, nil, nil, &ethtypes.AccessList{}),
+			types.NewTx(suite.chainID, 0, &suite.to, nil, 50, new(big.Int).Mul(suite.hundredBigInt, types.DefaultStepUpDownRatio), nil, nil, nil, &ethtypes.AccessList{}),
 			ethtypes.NewEIP2930Signer(suite.chainID),
 			big.NewInt(0),
 		},
@@ -603,8 +605,8 @@ func (suite *MsgsTestSuite) TestFromEthereumTx() {
 				Nonce:    0,
 				Data:     nil,
 				To:       &suite.to,
-				Value:    big.NewInt(10),
-				GasPrice: big.NewInt(1),
+				Value:    new(big.Int).Mul(big.NewInt(10), types.DefaultStepUpDownRatio),
+				GasPrice: new(big.Int).Mul(big.NewInt(1), types.DefaultStepUpDownRatio),
 				Gas:      21000,
 			})
 			tx, err := ethtypes.SignTx(tx, ethtypes.NewEIP2930Signer(suite.chainID), ethPriv)
@@ -616,7 +618,7 @@ func (suite *MsgsTestSuite) TestFromEthereumTx() {
 				Nonce: 0,
 				Data:  nil,
 				To:    &suite.to,
-				Value: big.NewInt(10),
+				Value: new(big.Int).Mul(big.NewInt(10), types.DefaultStepUpDownRatio),
 				Gas:   21000,
 			})
 			tx, err := ethtypes.SignTx(tx, ethtypes.NewLondonSigner(suite.chainID), ethPriv)
@@ -629,7 +631,7 @@ func (suite *MsgsTestSuite) TestFromEthereumTx() {
 				Data:     nil,
 				To:       &suite.to,
 				Value:    exp_10_80,
-				GasPrice: big.NewInt(1),
+				GasPrice: new(big.Int).Mul(big.NewInt(1), types.DefaultStepUpDownRatio),
 				Gas:      21000,
 			})
 			tx, err := ethtypes.SignTx(tx, ethtypes.NewEIP2930Signer(suite.chainID), ethPriv)
@@ -714,7 +716,7 @@ func (suite *MsgsTestSuite) TestTransactionCoding() {
 				Nonce:    i,
 				To:       &recipient,
 				Gas:      1,
-				GasPrice: big.NewInt(2),
+				GasPrice: new(big.Int).Mul(big.NewInt(2), types.DefaultStepUpDownRatio),
 				Data:     []byte("abcdef"),
 			}
 		case 1:
@@ -722,7 +724,7 @@ func (suite *MsgsTestSuite) TestTransactionCoding() {
 			txdata = &ethtypes.LegacyTx{
 				Nonce:    i,
 				Gas:      1,
-				GasPrice: big.NewInt(2),
+				GasPrice: new(big.Int).Mul(big.NewInt(2), types.DefaultStepUpDownRatio),
 				Data:     []byte("abcdef"),
 			}
 		case 2:
@@ -732,7 +734,7 @@ func (suite *MsgsTestSuite) TestTransactionCoding() {
 				Nonce:      i,
 				To:         &recipient,
 				Gas:        123457,
-				GasPrice:   big.NewInt(10),
+				GasPrice:   new(big.Int).Mul(big.NewInt(10), types.DefaultStepUpDownRatio),
 				AccessList: accesses,
 				Data:       []byte("abcdef"),
 			}
@@ -743,7 +745,7 @@ func (suite *MsgsTestSuite) TestTransactionCoding() {
 				Nonce:    i,
 				To:       &recipient,
 				Gas:      123457,
-				GasPrice: big.NewInt(10),
+				GasPrice: new(big.Int).Mul(big.NewInt(10), types.DefaultStepUpDownRatio),
 				Data:     []byte("abcdef"),
 			}
 		case 4:
@@ -752,7 +754,7 @@ func (suite *MsgsTestSuite) TestTransactionCoding() {
 				ChainID:    big.NewInt(1),
 				Nonce:      i,
 				Gas:        123457,
-				GasPrice:   big.NewInt(10),
+				GasPrice:   new(big.Int).Mul(big.NewInt(10), types.DefaultStepUpDownRatio),
 				AccessList: accesses,
 			}
 		}
