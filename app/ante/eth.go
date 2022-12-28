@@ -314,7 +314,7 @@ func (ctd CanTransferDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate 
 			//SteppedDownMaxFee to pass fee check
 			steppedDownMaxFee := new(big.Int).Div(coreMsg.GasFeeCap(), evmtypes.DefaultStepUpDownRatio)
 
-			if coreMsg.GasFeeCap().Cmp(baseFee) < 0 {
+			if steppedDownMaxFee.Cmp(baseFee) < 0 {
 				return ctx, sdkerrors.Wrapf(
 					sdkerrors.ErrInsufficientFee,
 					"max fee per gas less than block base fee (%s < %s)",
