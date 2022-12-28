@@ -5,7 +5,6 @@ import (
 	"math/big"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 func (suite *KeeperTestSuite) TestCalculateBaseFee() {
@@ -46,7 +45,7 @@ func (suite *KeeperTestSuite) TestCalculateBaseFee() {
 			false,
 			1,
 			50,
-			sdk.NewDec(1500000000),
+			sdk.NewDec(50000),
 			suite.app.FeeMarketKeeper.GetParams(suite.ctx).BaseFee.BigInt(),
 		},
 		{
@@ -55,15 +54,17 @@ func (suite *KeeperTestSuite) TestCalculateBaseFee() {
 			1,
 			100,
 			sdk.ZeroDec(),
-			big.NewInt(1125000000),
+			//Final base fee = baseFee * 1.125
+			big.NewInt(84375),
 		},
 		{
 			"with BaseFee - parent block wanted more gas than its target, with higher min gas price (ElasticityMultiplier = 2)",
 			false,
 			1,
 			100,
-			sdk.NewDec(1500000000),
-			big.NewInt(1125000000),
+			sdk.NewDec(150000),
+			//Final base fee = baseFee * 1.125
+			big.NewInt(84375),
 		},
 		{
 			"with BaseFee - Parent gas wanted smaller than parent gas target (ElasticityMultiplier = 2)",
@@ -71,15 +72,16 @@ func (suite *KeeperTestSuite) TestCalculateBaseFee() {
 			1,
 			25,
 			sdk.ZeroDec(),
-			big.NewInt(937500000),
+			//Final base fee = baseFee * 0.9375
+			big.NewInt(70313),
 		},
 		{
 			"with BaseFee - Parent gas wanted smaller than parent gas target, with higher min gas price (ElasticityMultiplier = 2)",
 			false,
 			1,
 			25,
-			sdk.NewDec(1500000000),
-			big.NewInt(1500000000),
+			sdk.NewDec(150000),
+			big.NewInt(150000),
 		},
 	}
 	for _, tc := range testCases {
@@ -89,6 +91,7 @@ func (suite *KeeperTestSuite) TestCalculateBaseFee() {
 			params := suite.app.FeeMarketKeeper.GetParams(suite.ctx)
 			params.NoBaseFee = tc.NoBaseFee
 			params.MinGasPrice = tc.minGasPrice
+			params.GasLimitPerBlock = sdk.NewInt(100)
 			suite.app.FeeMarketKeeper.SetParams(suite.ctx, params)
 
 			// Set block height
@@ -96,14 +99,6 @@ func (suite *KeeperTestSuite) TestCalculateBaseFee() {
 
 			// Set parent block gas
 			suite.app.FeeMarketKeeper.SetBlockGasWanted(suite.ctx, tc.parentBlockGasWanted)
-
-			// Set next block target/gasLimit through Consensus Param MaxGas
-			blockParams := abci.BlockParams{
-				MaxGas:   100,
-				MaxBytes: 10,
-			}
-			consParams := abci.ConsensusParams{Block: &blockParams}
-			suite.ctx = suite.ctx.WithConsensusParams(&consParams)
 
 			fee := suite.app.FeeMarketKeeper.CalculateBaseFee(suite.ctx)
 			if tc.NoBaseFee {
