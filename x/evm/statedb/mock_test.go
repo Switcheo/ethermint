@@ -112,3 +112,6 @@ func (k MockKeeper) Clone() *MockKeeper {
 	}
 	return &MockKeeper{accounts, codes}
 }
+func (k MockKeeper) GetCorrespondingAddressIfExists(ctx sdk.Context, addr common.Address) sdk.AccAddress {
+	return nil
+}
