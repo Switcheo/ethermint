@@ -2,7 +2,7 @@ package evm_test
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/evmos/ethermint/app"
+	"github.com/evmos/ethermint/testutil/test"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -137,14 +137,14 @@ func (suite *EvmTestSuite) TestInitGenesisAddressMapping() {
 				Params:   types.DefaultParams(),
 				Accounts: []types.GenesisAccount{},
 				EthToCosmosAddressMap: map[string]string{
-					app.Maker1.String(): app.Maker2.String(),
-					app.Maker3.String(): app.Maker4.String(),
-					app.Maker5.String(): app.Maker6.String(),
+					test.Maker1.String(): test.Maker2.String(),
+					test.Maker3.String(): test.Maker4.String(),
+					test.Maker5.String(): test.Maker6.String(),
 				},
 				CosmosToEthAddressMap: map[string]string{
-					app.Maker2.String(): app.Maker1.String(),
-					app.Maker4.String(): app.Maker3.String(),
-					app.Maker6.String(): app.Maker5.String(),
+					test.Maker2.String(): test.Maker1.String(),
+					test.Maker4.String(): test.Maker3.String(),
+					test.Maker6.String(): test.Maker5.String(),
 				},
 			},
 		},
@@ -181,13 +181,13 @@ func (suite *EvmTestSuite) TestInitGenesisAddressMapping() {
 		suite.Require().Equal(cosmosEthMapSize, len(testCases[0].genState.CosmosToEthAddressMap))
 		suite.Require().Equal(ethCosmosMapSize, len(testCases[0].genState.EthToCosmosAddressMap))
 
-		suite.Require().Equal(sdk.AccAddress(ethCosmosMap.Get(app.Maker1)).String(), testCases[0].genState.EthToCosmosAddressMap[app.Maker1.String()])
-		suite.Require().Equal(sdk.AccAddress(ethCosmosMap.Get(app.Maker3)).String(), testCases[0].genState.EthToCosmosAddressMap[app.Maker3.String()])
-		suite.Require().Equal(sdk.AccAddress(ethCosmosMap.Get(app.Maker5)).String(), testCases[0].genState.EthToCosmosAddressMap[app.Maker5.String()])
+		suite.Require().Equal(sdk.AccAddress(ethCosmosMap.Get(test.Maker1)).String(), testCases[0].genState.EthToCosmosAddressMap[test.Maker1.String()])
+		suite.Require().Equal(sdk.AccAddress(ethCosmosMap.Get(test.Maker3)).String(), testCases[0].genState.EthToCosmosAddressMap[test.Maker3.String()])
+		suite.Require().Equal(sdk.AccAddress(ethCosmosMap.Get(test.Maker5)).String(), testCases[0].genState.EthToCosmosAddressMap[test.Maker5.String()])
 
-		suite.Require().Equal(sdk.AccAddress(cosmosEthMap.Get(app.Maker2)).String(), testCases[0].genState.CosmosToEthAddressMap[app.Maker2.String()])
-		suite.Require().Equal(sdk.AccAddress(cosmosEthMap.Get(app.Maker4)).String(), testCases[0].genState.CosmosToEthAddressMap[app.Maker4.String()])
-		suite.Require().Equal(sdk.AccAddress(cosmosEthMap.Get(app.Maker6)).String(), testCases[0].genState.CosmosToEthAddressMap[app.Maker6.String()])
+		suite.Require().Equal(sdk.AccAddress(cosmosEthMap.Get(test.Maker2)).String(), testCases[0].genState.CosmosToEthAddressMap[test.Maker2.String()])
+		suite.Require().Equal(sdk.AccAddress(cosmosEthMap.Get(test.Maker4)).String(), testCases[0].genState.CosmosToEthAddressMap[test.Maker4.String()])
+		suite.Require().Equal(sdk.AccAddress(cosmosEthMap.Get(test.Maker6)).String(), testCases[0].genState.CosmosToEthAddressMap[test.Maker6.String()])
 
 	})
 
@@ -210,8 +210,8 @@ func (suite *EvmTestSuite) TestExportGenesisAddressMapping() {
 	}
 
 	suite.Run(testCases[0].name, func() {
-		suite.app.AccountKeeper.SetCorrespondingAddresses(suite.ctx, app.Maker1, app.Maker2)
-		suite.app.AccountKeeper.SetCorrespondingAddresses(suite.ctx, app.Maker3, app.Maker4)
+		suite.app.AccountKeeper.SetCorrespondingAddresses(suite.ctx, test.Maker1, test.Maker2)
+		suite.app.AccountKeeper.SetCorrespondingAddresses(suite.ctx, test.Maker3, test.Maker4)
 		genesisState := evm.ExportGenesis(suite.ctx, suite.app.EvmKeeper, suite.app.AccountKeeper)
 
 		ethCosmosMap := suite.app.AccountKeeper.Store(suite.ctx, authtypes.EthAddressToCosmosAddressKey)
@@ -234,11 +234,11 @@ func (suite *EvmTestSuite) TestExportGenesisAddressMapping() {
 		suite.Require().Equal(cosmosEthMapSize, len(genesisState.CosmosToEthAddressMap))
 		suite.Require().Equal(ethCosmosMapSize, len(genesisState.EthToCosmosAddressMap))
 
-		suite.Require().Equal(sdk.AccAddress(ethCosmosMap.Get(app.Maker2)).String(), genesisState.EthToCosmosAddressMap[app.Maker2.String()])
-		suite.Require().Equal(sdk.AccAddress(ethCosmosMap.Get(app.Maker4)).String(), genesisState.EthToCosmosAddressMap[app.Maker4.String()])
+		suite.Require().Equal(sdk.AccAddress(ethCosmosMap.Get(test.Maker2)).String(), genesisState.EthToCosmosAddressMap[test.Maker2.String()])
+		suite.Require().Equal(sdk.AccAddress(ethCosmosMap.Get(test.Maker4)).String(), genesisState.EthToCosmosAddressMap[test.Maker4.String()])
 
-		suite.Require().Equal(sdk.AccAddress(cosmosEthMap.Get(app.Maker1)).String(), genesisState.CosmosToEthAddressMap[app.Maker1.String()])
-		suite.Require().Equal(sdk.AccAddress(cosmosEthMap.Get(app.Maker3)).String(), genesisState.CosmosToEthAddressMap[app.Maker3.String()])
+		suite.Require().Equal(sdk.AccAddress(cosmosEthMap.Get(test.Maker1)).String(), genesisState.CosmosToEthAddressMap[test.Maker1.String()])
+		suite.Require().Equal(sdk.AccAddress(cosmosEthMap.Get(test.Maker3)).String(), genesisState.CosmosToEthAddressMap[test.Maker3.String()])
 
 	})
 

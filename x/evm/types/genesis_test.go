@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/evmos/ethermint/app"
+	"github.com/evmos/ethermint/testutil/test"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -222,14 +222,14 @@ func (suite *GenesisTestSuite) TestValidateGenesis() {
 				},
 				Params: DefaultParams(),
 				EthToCosmosAddressMap: map[string]string{
-					app.Maker1.String(): app.Maker2.String(),
-					app.Maker3.String(): app.Maker4.String(),
-					app.Maker5.String(): app.Maker6.String(),
+					test.Maker1.String(): test.Maker2.String(),
+					test.Maker3.String(): test.Maker4.String(),
+					test.Maker5.String(): test.Maker6.String(),
 				},
 				CosmosToEthAddressMap: map[string]string{
-					app.Maker2.String(): app.Maker1.String(),
-					app.Maker4.String(): app.Maker3.String(),
-					app.Maker6.String(): app.Maker5.String(),
+					test.Maker2.String(): test.Maker1.String(),
+					test.Maker4.String(): test.Maker3.String(),
+					test.Maker6.String(): test.Maker5.String(),
 				},
 			},
 			expPass: true,
@@ -268,12 +268,12 @@ func (suite *GenesisTestSuite) TestValidateGenesis() {
 				},
 				Params: DefaultParams(),
 				EthToCosmosAddressMap: map[string]string{
-					app.Maker1.String(): app.Maker2.String(),
-					app.Maker3.String(): app.Maker2.String(),
+					test.Maker1.String(): test.Maker2.String(),
+					test.Maker3.String(): test.Maker2.String(),
 				},
 				CosmosToEthAddressMap: map[string]string{
-					app.Maker2.String(): app.Maker1.String(),
-					app.Maker4.String(): app.Maker3.String(),
+					test.Maker2.String(): test.Maker1.String(),
+					test.Maker4.String(): test.Maker3.String(),
 				},
 			},
 			expPass: false,
@@ -293,12 +293,12 @@ func (suite *GenesisTestSuite) TestValidateGenesis() {
 				},
 				Params: DefaultParams(),
 				EthToCosmosAddressMap: map[string]string{
-					app.Maker1.String(): app.Maker1.String(),
-					app.Maker3.String(): app.Maker2.String(),
+					test.Maker1.String(): test.Maker1.String(),
+					test.Maker3.String(): test.Maker2.String(),
 				},
 				CosmosToEthAddressMap: map[string]string{
-					app.Maker2.String(): app.Maker1.String(),
-					app.Maker4.String(): app.Maker3.String(),
+					test.Maker2.String(): test.Maker1.String(),
+					test.Maker4.String(): test.Maker3.String(),
 				},
 			},
 			expPass: false,
