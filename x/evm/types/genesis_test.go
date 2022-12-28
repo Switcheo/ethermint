@@ -1,6 +1,7 @@
 package types
 
 import (
+	"github.com/evmos/ethermint/app"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -203,6 +204,102 @@ func (suite *GenesisTestSuite) TestValidateGenesis() {
 			name: "invalid params",
 			genState: &GenesisState{
 				Params: Params{},
+			},
+			expPass: false,
+		},
+		{
+			name: "valid genesis with address mapping",
+			genState: &GenesisState{
+				Accounts: []GenesisAccount{
+					{
+						Address: suite.address,
+
+						Code: suite.code,
+						Storage: Storage{
+							{Key: suite.hash.String()},
+						},
+					},
+				},
+				Params: DefaultParams(),
+				EthToCosmosAddressMap: map[string]string{
+					app.Maker1.String(): app.Maker2.String(),
+					app.Maker3.String(): app.Maker4.String(),
+					app.Maker5.String(): app.Maker6.String(),
+				},
+				CosmosToEthAddressMap: map[string]string{
+					app.Maker2.String(): app.Maker1.String(),
+					app.Maker4.String(): app.Maker3.String(),
+					app.Maker6.String(): app.Maker5.String(),
+				},
+			},
+			expPass: true,
+		},
+		{
+			name: "invalid genesis with invalid address mapping",
+			genState: &GenesisState{
+				Accounts: []GenesisAccount{
+					{
+						Address: suite.address,
+
+						Code: suite.code,
+						Storage: Storage{
+							{Key: suite.hash.String()},
+						},
+					},
+				},
+				Params:                DefaultParams(),
+				EthToCosmosAddressMap: map[string]string{"ethm1": "ethm1"},
+				CosmosToEthAddressMap: map[string]string{"ethm1": "ethm1"},
+			},
+			expPass: false,
+		},
+		{
+			name: "invalid genesis with duplicate address value",
+			genState: &GenesisState{
+				Accounts: []GenesisAccount{
+					{
+						Address: suite.address,
+
+						Code: suite.code,
+						Storage: Storage{
+							{Key: suite.hash.String()},
+						},
+					},
+				},
+				Params: DefaultParams(),
+				EthToCosmosAddressMap: map[string]string{
+					app.Maker1.String(): app.Maker2.String(),
+					app.Maker3.String(): app.Maker2.String(),
+				},
+				CosmosToEthAddressMap: map[string]string{
+					app.Maker2.String(): app.Maker1.String(),
+					app.Maker4.String(): app.Maker3.String(),
+				},
+			},
+			expPass: false,
+		},
+		{
+			name: "invalid genesis with same address key and value",
+			genState: &GenesisState{
+				Accounts: []GenesisAccount{
+					{
+						Address: suite.address,
+
+						Code: suite.code,
+						Storage: Storage{
+							{Key: suite.hash.String()},
+						},
+					},
+				},
+				Params: DefaultParams(),
+				EthToCosmosAddressMap: map[string]string{
+					app.Maker1.String(): app.Maker1.String(),
+					app.Maker3.String(): app.Maker2.String(),
+				},
+				CosmosToEthAddressMap: map[string]string{
+					app.Maker2.String(): app.Maker1.String(),
+					app.Maker4.String(): app.Maker3.String(),
+				},
 			},
 			expPass: false,
 		},

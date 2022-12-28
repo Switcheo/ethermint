@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/evmos/ethermint/tests"
+	"github.com/evmos/ethermint/app"
 	types2 "github.com/evmos/ethermint/x/feemarket/types"
 	"math/big"
 
@@ -40,7 +40,7 @@ func (suite *KeeperTestSuite) TestMergedAccountsAddressMappings() {
 		{
 			"get Merged Accounts address should be what is stored in the account keeper",
 			func() {
-				suite.app.AccountKeeper.SetCorrespondingAddresses(suite.ctx, tests.Maker1, tests.Maker2)
+				suite.app.AccountKeeper.SetCorrespondingAddresses(suite.ctx, app.Maker1, app.Maker2)
 			},
 			true,
 			func(response *types.QueryMergedAccountsMappingResponse) {
@@ -63,8 +63,8 @@ func (suite *KeeperTestSuite) TestMergedAccountsAddressMappings() {
 				suite.Require().Equal(cosmosEthMapSize, len(response.CosmosToEthAddressMap))
 				suite.Require().Equal(ethCosmosMapSize, len(response.EthToCosmosAddressMap))
 
-				suite.Require().Equal(sdk.AccAddress(ethCosmosMap.Get(tests.Maker1)).String(), response.EthToCosmosAddressMap[tests.Maker1.String()])
-				suite.Require().Equal(sdk.AccAddress(cosmosEthMap.Get(tests.Maker2)).String(), response.CosmosToEthAddressMap[tests.Maker2.String()])
+				suite.Require().Equal(sdk.AccAddress(ethCosmosMap.Get(app.Maker1)).String(), response.EthToCosmosAddressMap[app.Maker1.String()])
+				suite.Require().Equal(sdk.AccAddress(cosmosEthMap.Get(app.Maker2)).String(), response.CosmosToEthAddressMap[app.Maker2.String()])
 
 			},
 		},
