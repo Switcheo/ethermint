@@ -199,7 +199,7 @@ func (s AnteTestSuite) TestEthMinGasPriceDecorator() {
 				params.MinGasPrice = sdk.ZeroDec()
 				s.app.FeeMarketKeeper.SetParams(s.ctx, params)
 
-				msg := s.BuildTestEthTx(from, to, nil, make([]byte, 0), big.NewInt(10), nil, nil, nil)
+				msg := s.BuildTestEthTx(from, to, nil, make([]byte, 0), new(big.Int).Mul(big.NewInt(10), evmtypes.DefaultStepUpDownRatio), nil, nil, nil)
 				return s.CreateTestTx(msg, privKey, 1, false)
 			},
 			true,
@@ -212,7 +212,7 @@ func (s AnteTestSuite) TestEthMinGasPriceDecorator() {
 				params.MinGasPrice = sdk.NewDec(10)
 				s.app.FeeMarketKeeper.SetParams(s.ctx, params)
 
-				msg := s.BuildTestEthTx(from, to, nil, make([]byte, 0), big.NewInt(10), nil, nil, nil)
+				msg := s.BuildTestEthTx(from, to, nil, make([]byte, 0), new(big.Int).Mul(big.NewInt(10), evmtypes.DefaultStepUpDownRatio), nil, nil, nil)
 				return s.CreateTestTx(msg, privKey, 1, false)
 			},
 			true,
@@ -251,7 +251,7 @@ func (s AnteTestSuite) TestEthMinGasPriceDecorator() {
 				params.MinGasPrice = sdk.ZeroDec()
 				s.app.FeeMarketKeeper.SetParams(s.ctx, params)
 
-				msg := s.BuildTestEthTx(from, to, nil, make([]byte, 0), nil, big.NewInt(100), big.NewInt(50), &emptyAccessList)
+				msg := s.BuildTestEthTx(from, to, nil, make([]byte, 0), nil, new(big.Int).Mul(big.NewInt(100), evmtypes.DefaultStepUpDownRatio), big.NewInt(50), &emptyAccessList)
 				return s.CreateTestTx(msg, privKey, 1, false)
 			},
 			true,
@@ -264,7 +264,7 @@ func (s AnteTestSuite) TestEthMinGasPriceDecorator() {
 				params.MinGasPrice = sdk.NewDec(10)
 				s.app.FeeMarketKeeper.SetParams(s.ctx, params)
 
-				msg := s.BuildTestEthTx(from, to, nil, make([]byte, 0), nil, big.NewInt(100), big.NewInt(100), &emptyAccessList)
+				msg := s.BuildTestEthTx(from, to, nil, make([]byte, 0), nil, new(big.Int).Mul(big.NewInt(100), evmtypes.DefaultStepUpDownRatio), big.NewInt(100), &emptyAccessList)
 				return s.CreateTestTx(msg, privKey, 1, false)
 			},
 			true,
@@ -294,7 +294,7 @@ func (s AnteTestSuite) TestEthMinGasPriceDecorator() {
 				feemarketParams.BaseFee = sdk.NewInt(10)
 				s.app.FeeMarketKeeper.SetParams(s.ctx, feemarketParams)
 
-				msg := s.BuildTestEthTx(from, to, nil, make([]byte, 0), nil, big.NewInt(1000), big.NewInt(0), &emptyAccessList)
+				msg := s.BuildTestEthTx(from, to, nil, make([]byte, 0), nil, new(big.Int).Mul(big.NewInt(1000), evmtypes.DefaultStepUpDownRatio), big.NewInt(0), &emptyAccessList)
 				return s.CreateTestTx(msg, privKey, 1, false)
 			},
 			false,
@@ -311,7 +311,7 @@ func (s AnteTestSuite) TestEthMinGasPriceDecorator() {
 				feemarketParams.BaseFee = sdk.NewInt(10)
 				s.app.FeeMarketKeeper.SetParams(s.ctx, feemarketParams)
 
-				msg := s.BuildTestEthTx(from, to, nil, make([]byte, 0), nil, big.NewInt(1000), big.NewInt(101), &emptyAccessList)
+				msg := s.BuildTestEthTx(from, to, nil, make([]byte, 0), nil, new(big.Int).Mul(big.NewInt(100), evmtypes.DefaultStepUpDownRatio), new(big.Int).Mul(big.NewInt(101), evmtypes.DefaultStepUpDownRatio), &emptyAccessList)
 				return s.CreateTestTx(msg, privKey, 1, false)
 			},
 			true,

@@ -162,7 +162,7 @@ require (
 
 replace (
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.1.7-0.20210622111912-ef00f8ac3d76
-	github.com/cosmos/cosmos-sdk => github.com/Switcheo/cosmos-sdk v0.45.10-0.20221222082225-9eb5f433758e
+	github.com/cosmos/cosmos-sdk => github.com/Switcheo/cosmos-sdk v0.45.10-0.20221227041205-84e120bb680b
 	github.com/cosmos/iavl => github.com/Switcheo/iavl v0.19.4-0.20221201205217-595bd9406da2
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2

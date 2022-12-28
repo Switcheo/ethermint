@@ -394,7 +394,6 @@ benchmark:
 
 update-mock:
 	./scripts/update_mock.sh
-.PHONY: update-mock
 
 ###############################################################################
 ###                                Linting                                  ###
