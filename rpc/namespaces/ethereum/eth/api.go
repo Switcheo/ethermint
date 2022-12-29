@@ -149,20 +149,8 @@ func (e *PublicAPI) BlockNumber() (hexutil.Uint64, error) {
 // GetBlockByNumber returns the block identified by number.
 func (e *PublicAPI) GetBlockByNumber(ethBlockNum rpctypes.BlockNumber, fullTx bool) (map[string]interface{}, error) {
 	e.logger.Debug("eth_getBlockByNumber", "number", ethBlockNum, "full", fullTx)
-	res, err := e.backend.GetBlockByNumber(ethBlockNum, fullTx)
-	if err != nil {
-		return nil, err
-	}
-	//Base fee stepped up to show correctly on metamask
-	if baseFee := res["baseFeePerGas"]; baseFee != nil {
-		baseFeeHex, ok := baseFee.(*hexutil.Big)
-		if ok {
-			steppedUpBaseFee := new(big.Int).Mul(baseFeeHex.ToInt(), evmtypes.DefaultStepUpDownRatio)
-			res["baseFeePerGas"] = (*hexutil.Big)(steppedUpBaseFee)
-		}
+	return e.backend.GetBlockByNumber(ethBlockNum, fullTx)
 
-	}
-	return res, nil
 }
 
 // GetBlockByHash returns the block identified by hash.
