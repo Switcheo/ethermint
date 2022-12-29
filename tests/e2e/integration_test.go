@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/evmos/ethermint/x/evm/keeper"
 	"math/big"
 	"testing"
 
@@ -83,13 +84,13 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	s.rpcClient = rpcClient
 	s.gethClient = gethclient.New(rpcClient)
 	s.Require().NotNil(s.gethClient)
-	chainId, err := ethermint.ParseChainID(s.cfg.ChainID)
+	chainId, err := ethermint.ParseChainID(keeper.EvmChainId)
 	s.Require().NoError(err)
 	s.ethSigner = ethtypes.LatestSignerForChainID(chainId)
 }
 
 func (s *IntegrationTestSuite) TestChainID() {
-	genesisRes, err := s.network.Validators[0].RPCClient.Genesis(s.ctx)
+	_, err := s.network.Validators[0].RPCClient.Genesis(s.ctx)
 	s.Require().NoError(err)
 
 	chainID, err := s.network.Validators[0].JSONRPCClient.ChainID(s.ctx)
@@ -98,13 +99,14 @@ func (s *IntegrationTestSuite) TestChainID() {
 
 	s.T().Log(chainID.Int64())
 
-	eip155ChainID, err := ethermint.ParseChainID(s.network.Config.ChainID)
+	eip155ChainID, err := ethermint.ParseChainID(keeper.EvmChainId)
 	s.Require().NoError(err)
-	eip155ChainIDGen, err := ethermint.ParseChainID(genesisRes.Genesis.ChainID)
+	//ignore comparison of evm chain id with genesis chain id as it will be different for carbon
+	//_, err := ethermint.ParseChainID(genesisRes.Genesis.ChainID)
+
 	s.Require().NoError(err)
 
 	s.Require().Equal(chainID, eip155ChainID)
-	s.Require().Equal(eip155ChainID, eip155ChainIDGen)
 }
 
 func (s *IntegrationTestSuite) TestNodeInfo() {
@@ -363,7 +365,7 @@ func (s *IntegrationTestSuite) TestGetBalance() {
 	initialBalance, err := s.network.Validators[0].JSONRPCClient.BalanceAt(s.ctx, common.HexToAddress("0x378c50D9264C63F3F92B806d4ee56E9D86FfB3Ed"), big.NewInt(int64(blockNumber)))
 	s.Require().NoError(err)
 
-	amountToTransfer := big.NewInt(10)
+	amountToTransfer := new(big.Int).Mul(big.NewInt(10), evmtypes.DefaultStepUpDownRatio)
 	signedTx := s.signValidTx(common.HexToAddress("0x378c50D9264C63F3F92B806d4ee56E9D86FfB3Ed"), amountToTransfer)
 	err = s.network.Validators[0].JSONRPCClient.SendTransaction(s.ctx, signedTx.AsTransaction())
 	s.Require().NoError(err)
@@ -771,7 +773,9 @@ func (s *IntegrationTestSuite) TestBatchETHTransactions() {
 	var msgs []sdk.Msg
 
 	for i := 0; i < ethTxs; i++ {
-		chainId, err := s.network.Validators[0].JSONRPCClient.ChainID(s.ctx)
+
+		chainId, err := ethermint.ParseChainID(keeper.EvmChainId)
+
 		s.Require().NoError(err)
 
 		gasPrice := s.getGasPrice()
@@ -782,10 +786,10 @@ func (s *IntegrationTestSuite) TestBatchETHTransactions() {
 			chainId,
 			nonce,
 			&recipient,
-			big.NewInt(10),
+			new(big.Int).Mul(big.NewInt(10), evmtypes.DefaultStepUpDownRatio),
 			100000,
-			gasPrice,
-			big.NewInt(200),
+			gasPrice, //stepped up already as it is calling "eth_gasPrice" JSON-RPC
+			new(big.Int).Mul(big.NewInt(200), evmtypes.DefaultStepUpDownRatio),
 			nil,
 			nil,
 			nil,
