@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	cmdcfg "github.com/evmos/ethermint/cmd/config"
 	"math/rand"
 	"time"
 
@@ -28,6 +29,17 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 )
+
+func init() {
+	SetupConfig()
+}
+func SetupConfig() {
+	// set the address prefixes
+	config := sdk.GetConfig()
+	cmdcfg.SetBech32Prefixes(config)
+	cmdcfg.SetBip44CoinType(config)
+	config.Seal()
+}
 
 // DefaultConsensusParams defines the default Tendermint consensus params used in
 // EthermintApp testing.
