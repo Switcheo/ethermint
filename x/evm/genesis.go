@@ -60,17 +60,18 @@ func InitGenesis(
 		for _, storage := range account.Storage {
 			k.SetState(ctx, address, common.HexToHash(storage.Key), common.HexToHash(storage.Value).Bytes())
 		}
-		for ethAddr, cosmosAddr := range data.EthToCosmosAddressMap {
-			ethAddrBz := sdk.MustAccAddressFromBech32(ethAddr)
-			cosmosAddrBz := sdk.MustAccAddressFromBech32(cosmosAddr)
-			accountKeeper.AddToEthToCosmosAddressMap(ctx, ethAddrBz, cosmosAddrBz)
-		}
+	}
 
-		for cosmosAddr, ethAddr := range data.CosmosToEthAddressMap {
-			ethAddrBz := sdk.MustAccAddressFromBech32(ethAddr)
-			cosmosAddrBz := sdk.MustAccAddressFromBech32(cosmosAddr)
-			accountKeeper.AddToCosmosToEthAddressMap(ctx, cosmosAddrBz, ethAddrBz)
-		}
+	for ethAddr, cosmosAddr := range data.EthToCosmosAddressMap {
+		ethAddrBz := sdk.MustAccAddressFromBech32(ethAddr)
+		cosmosAddrBz := sdk.MustAccAddressFromBech32(cosmosAddr)
+		accountKeeper.AddToEthToCosmosAddressMap(ctx, ethAddrBz, cosmosAddrBz)
+	}
+
+	for cosmosAddr, ethAddr := range data.CosmosToEthAddressMap {
+		ethAddrBz := sdk.MustAccAddressFromBech32(ethAddr)
+		cosmosAddrBz := sdk.MustAccAddressFromBech32(cosmosAddr)
+		accountKeeper.AddToCosmosToEthAddressMap(ctx, cosmosAddrBz, ethAddrBz)
 	}
 
 	return []abci.ValidatorUpdate{}
