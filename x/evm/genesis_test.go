@@ -153,8 +153,8 @@ func (suite *EvmTestSuite) TestInitGenesisAddressMapping() {
 			&types.GenesisState{
 				Params:                types.DefaultParams(),
 				Accounts:              []types.GenesisAccount{},
-				EthToCosmosAddressMap: map[string]string{"tswth1": "tswth2"},
-				CosmosToEthAddressMap: map[string]string{"tswth3": "tswth4"},
+				EthToCosmosAddressMap: map[string]string{"ethm1": "ethm2"},
+				CosmosToEthAddressMap: map[string]string{"ethm3": "ethm4"},
 			},
 		},
 	}
