@@ -52,7 +52,7 @@ func (k *Keeper) MergeUserAccount(ctx sdk.Context, msg *types.MsgMergeAccount) e
 			k.accountKeeper.SetCorrespondingAddresses(ctx, cosmosAcc.GetAddress(), ethAddr)
 			return ctx.EventManager().EmitTypedEvents(&types.MergeAccountEvent{
 				CosmosAddress:       cosmosAcc.GetAddress().String(),
-				EthAddress:          ethAcc.GetAddress().String(),
+				EthAddress:          ethAddr.String(),
 				NewCosmosAccCreated: newCosmosAccCreated,
 			})
 		}
