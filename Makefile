@@ -302,6 +302,10 @@ TEST_TARGETS := test-unit test-unit-cover test-race
 test-unit: ARGS=-timeout=10m -race -ldflags "$(ldflags)"
 test-unit: TEST_PACKAGES=$(PACKAGES_UNIT)
 
+test-path: go.sum
+		GO111MODULE=on go install -mod=readonly -ldflags "$(ldflags)" ./cmd/ethermintd
+		@go test -ldflags "$(ldflags)" $(TESTPATH)
+
 test-race: ARGS=-race
 test-race: TEST_PACKAGES=$(PACKAGES_NOSIMULATION)
 $(TEST_TARGETS): run-tests
