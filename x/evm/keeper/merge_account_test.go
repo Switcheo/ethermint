@@ -15,15 +15,15 @@ import (
 var _ = Describe("Merge Account test", func() {
 
 	var (
-		app           *app.EthermintApp
+		ethermintApp  *app.EthermintApp
 		ctx           sdk.Context
 		k             keeper.Keeper
 		accountKeeper types.AccountKeeper
 		bankKeeper    types.BankKeeper
 	)
 	var (
-		ethAccAddr, _    = sdk.AccAddressFromBech32("ethm12w696c2ef6efgd69xdxt4jeamlc5kgqpdj9tt6")
-		cosmosAccAddr, _ = sdk.AccAddressFromBech32("tswth12w696c2ef6efgd69xdxt4jeamlc5kgqpd4s0zy")
+		ethAccAddr, _    = sdk.AccAddressFromBech32("ethm1sdn3kaup7hw5pcmk5sf9j848rzcct7jp7jetft")
+		cosmosAccAddr, _ = sdk.AccAddressFromBech32("ethm12w696c2ef6efgd69xdxt4jeamlc5kgqpdj9tt6")
 		cosmosAddr       = cosmosAccAddr.String()
 		ethAddr          = ethAccAddr.String()
 		pubKey           = "039d10cebb893e15e2d192d116c9f9c07319fdfd1e7b9d178c50137aeb237979b6"
@@ -31,12 +31,11 @@ var _ = Describe("Merge Account test", func() {
 	)
 
 	BeforeEach(func() {
-		suite := KeeperTestSuite{}
-		suite.SetupTest()
-		ctx = app.BaseApp.NewContext(false, tmproto.Header{})
-		k = *app.EvmKeeper
-		accountKeeper = app.AccountKeeper
-		bankKeeper = app.BankKeeper
+		ethermintApp = app.Setup(false, nil)
+		ctx = ethermintApp.BaseApp.NewContext(false, tmproto.Header{})
+		k = *ethermintApp.EvmKeeper
+		accountKeeper = ethermintApp.AccountKeeper
+		bankKeeper = ethermintApp.BankKeeper
 	})
 
 	Describe("Merge account from ETH account Scenario 1", func() {
@@ -45,13 +44,13 @@ var _ = Describe("Merge Account test", func() {
 		initialCosmosAmount := sdk.NewIntWithDecimal(1_000_000_000, 8)
 		Context("when merging ETH account with an already present corresponding cosmos account", func() {
 			BeforeEach(func() {
-				err := testutil.FundAccount(app.BankKeeper, ctx, ethAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialEthAmount)))
+				err := testutil.FundAccount(ethermintApp.BankKeeper, ctx, ethAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialEthAmount)))
 				Expect(err).Should(BeNil())
 
-				err = testutil.FundAccount(app.BankKeeper, ctx, ethAccAddr, sdk.NewCoins(sdk.NewCoin(iusd, initialEthAmount)))
+				err = testutil.FundAccount(ethermintApp.BankKeeper, ctx, ethAccAddr, sdk.NewCoins(sdk.NewCoin(iusd, initialEthAmount)))
 				Expect(err).Should(BeNil())
 
-				err = testutil.FundAccount(app.BankKeeper, ctx, cosmosAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialCosmosAmount)))
+				err = testutil.FundAccount(ethermintApp.BankKeeper, ctx, cosmosAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialCosmosAmount)))
 				Expect(err).Should(BeNil())
 
 			})
@@ -59,10 +58,10 @@ var _ = Describe("Merge Account test", func() {
 				"Eth-cosmos address mapping should also be added into accountKeeper"+
 				"Nonce in cosmos acc should be updated to the higher one(from ETH)", func() {
 				//Artificially increase eth acc nonce for check later
-				ethAcc := app.AccountKeeper.GetAccount(ctx, ethAccAddr)
+				ethAcc := ethermintApp.AccountKeeper.GetAccount(ctx, ethAccAddr)
 				var ethSequence uint64 = 1000
 				_ = ethAcc.SetSequence(ethSequence)
-				app.AccountKeeper.SetAccount(ctx, ethAcc)
+				ethermintApp.AccountKeeper.SetAccount(ctx, ethAcc)
 
 				msg := types.NewMsgMergeAccount(ethAddr, pubKey, true)
 				err := k.MergeUserAccount(ctx, msg)
@@ -121,7 +120,7 @@ var _ = Describe("Merge Account test", func() {
 		initialCosmosAmount := sdk.NewIntWithDecimal(0, 8)
 		Context("when merging ETH account with an absent cosmos account", func() {
 			BeforeEach(func() {
-				err := testutil.FundAccount(app.BankKeeper, ctx, ethAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialEthAmount)))
+				err := testutil.FundAccount(ethermintApp.BankKeeper, ctx, ethAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialEthAmount)))
 				Expect(err).Should(BeNil())
 
 			})
@@ -181,9 +180,9 @@ var _ = Describe("Merge Account test", func() {
 		Context("when merging ETH account with an already present merged cosmos account(mapping already exists), but original eth account still exists (ideally shouldn't happen)", func() {
 			BeforeEach(func() {
 				accountKeeper.SetCorrespondingAddresses(ctx, cosmosAccAddr, ethAccAddr)
-				err := testutil.FundAccount(app.BankKeeper, ctx, ethAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialEthAmount)))
+				err := testutil.FundAccount(ethermintApp.BankKeeper, ctx, ethAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialEthAmount)))
 				Expect(err).Should(BeNil())
-				err = testutil.FundAccount(app.BankKeeper, ctx, cosmosAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialCosmosAmount)))
+				err = testutil.FundAccount(ethermintApp.BankKeeper, ctx, cosmosAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialCosmosAmount)))
 				Expect(err).Should(BeNil())
 
 			})
@@ -241,7 +240,7 @@ var _ = Describe("Merge Account test", func() {
 			BeforeEach(func() {
 				accountKeeper.SetCorrespondingAddresses(ctx, cosmosAccAddr, ethAccAddr)
 
-				err := testutil.FundAccount(app.BankKeeper, ctx, cosmosAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialCosmosAmount)))
+				err := testutil.FundAccount(ethermintApp.BankKeeper, ctx, cosmosAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialCosmosAmount)))
 				Expect(err).Should(BeNil())
 
 			})
@@ -271,7 +270,7 @@ var _ = Describe("Merge Account test", func() {
 		initialCosmosAmount := sdk.NewIntWithDecimal(1_000_000_000, 8)
 		Context("when merging cosmos account without any eth account", func() {
 			BeforeEach(func() {
-				err := testutil.FundAccount(app.BankKeeper, ctx, cosmosAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialCosmosAmount)))
+				err := testutil.FundAccount(ethermintApp.BankKeeper, ctx, cosmosAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialCosmosAmount)))
 				Expect(err).Should(BeNil())
 
 			})
@@ -325,10 +324,10 @@ var _ = Describe("Merge Account test", func() {
 		initialEthAmount := sdk.NewIntWithDecimal(1_000_000_000, 8)
 		Context("when merging cosmos account with eth account present", func() {
 			BeforeEach(func() {
-				err := testutil.FundAccount(app.BankKeeper, ctx, ethAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialEthAmount)))
+				err := testutil.FundAccount(ethermintApp.BankKeeper, ctx, ethAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialEthAmount)))
 				Expect(err).Should(BeNil())
 
-				err = testutil.FundAccount(app.BankKeeper, ctx, cosmosAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialCosmosAmount)))
+				err = testutil.FundAccount(ethermintApp.BankKeeper, ctx, cosmosAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialCosmosAmount)))
 				Expect(err).Should(BeNil())
 
 			})
@@ -387,10 +386,10 @@ var _ = Describe("Merge Account test", func() {
 			BeforeEach(func() {
 				accountKeeper.SetCorrespondingAddresses(ctx, cosmosAccAddr, ethAccAddr)
 
-				err := testutil.FundAccount(app.BankKeeper, ctx, ethAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialEthAmount)))
+				err := testutil.FundAccount(ethermintApp.BankKeeper, ctx, ethAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialEthAmount)))
 				Expect(err).Should(BeNil())
 
-				err = testutil.FundAccount(app.BankKeeper, ctx, cosmosAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialCosmosAmount)))
+				err = testutil.FundAccount(ethermintApp.BankKeeper, ctx, cosmosAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialCosmosAmount)))
 				Expect(err).Should(BeNil())
 
 			})
@@ -448,7 +447,7 @@ var _ = Describe("Merge Account test", func() {
 			BeforeEach(func() {
 				accountKeeper.SetCorrespondingAddresses(ctx, cosmosAccAddr, ethAccAddr)
 
-				err := testutil.FundAccount(app.BankKeeper, ctx, cosmosAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialCosmosAmount)))
+				err := testutil.FundAccount(ethermintApp.BankKeeper, ctx, cosmosAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialCosmosAmount)))
 				Expect(err).Should(BeNil())
 
 			})
