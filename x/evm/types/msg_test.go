@@ -115,7 +115,6 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 	hundredInt := big.NewInt(100)
 	zeroInt := big.NewInt(0)
 	minusOneInt := big.NewInt(-1)
-	exp_2_255 := new(big.Int).Exp(big.NewInt(2), big.NewInt(255), nil)
 
 	testCases := []struct {
 		msg        string
@@ -251,16 +250,6 @@ func (suite *MsgsTestSuite) TestMsgEthereumTx_ValidateBasic() {
 			gasFeeCap:  nil,
 			gasTipCap:  nil,
 			from:       invalidFromAddress,
-			expectPass: false,
-		},
-		{
-			msg:        "out of bound gas fee - Legacy Tx",
-			to:         suite.to.Hex(),
-			amount:     hundredIntSteppedUp,
-			gasLimit:   1000,
-			gasPrice:   exp_2_255,
-			gasFeeCap:  nil,
-			gasTipCap:  nil,
 			expectPass: false,
 		},
 		{
