@@ -46,9 +46,6 @@ func (k *Keeper) MergeUserAccount(ctx sdk.Context, msg *types.MsgMergeAccount) e
 		ethAcc = k.accountKeeper.GetAccount(ctx, ethAddr)
 		cosmosAcc = k.accountKeeper.GetAccount(ctx, addr)
 		if ethAcc == nil {
-			if err = k.moveEthBankBalanceToCosmosAddress(ctx, ethAddr, addr); err != nil {
-				return err
-			}
 			k.accountKeeper.SetCorrespondingAddresses(ctx, cosmosAcc.GetAddress(), ethAddr)
 			return ctx.EventManager().EmitTypedEvents(&types.MergeAccountEvent{
 				CosmosAddress:       cosmosAcc.GetAddress().String(),
