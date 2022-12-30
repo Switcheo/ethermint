@@ -1,7 +1,6 @@
 package keeper_test
 
 import (
-	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/evmos/ethermint/app"
 	"github.com/evmos/ethermint/testutil"
@@ -45,8 +44,6 @@ var _ = Describe("Merge Account test", func() {
 		initialCosmosAmount := sdk.NewIntWithDecimal(1_000_000_000, 8)
 		Context("when merging ETH account with an already present corresponding cosmos account", func() {
 			BeforeEach(func() {
-				fmt.Println("ethAccAddr:", ethAccAddr)
-				fmt.Println("config: ", sdk.GetConfig())
 				err := testutil.FundAccount(ethermintApp.BankKeeper, ctx, ethAccAddr, sdk.NewCoins(sdk.NewCoin(evmDenom, initialEthAmount)))
 				Expect(err).Should(BeNil())
 
