@@ -574,16 +574,16 @@ func (suite *KeeperTestSuite) TestEstimateGas() {
 		{"not enough balance", func() {
 			args = types.TransactionArgs{To: &common.Address{}, Value: (*hexutil.Big)(new(big.Int).Mul(big.NewInt(100), types.DefaultStepUpDownRatio))}
 		}, false, 0, false},
-		// should success, enough balance now
-		{"enough balance", func() {
-			args = types.TransactionArgs{To: &common.Address{}, From: &suite.address, Value: (*hexutil.Big)(big.NewInt(100))}
+		// should not success, not enough balance still
+		{"not enough balance", func() {
+			args = types.TransactionArgs{To: &common.Address{}, From: &suite.address, Value: (*hexutil.Big)(new(big.Int).Mul(big.NewInt(100), types.DefaultStepUpDownRatio))}
 		}, false, 0, false},
 		// should success, because gas limit lower than 21000 is ignored
 		{"gas exceed allowance", func() {
 			args = types.TransactionArgs{To: &common.Address{}, Gas: &gasHelper}
 		}, true, 21000, false},
 		// should fail, invalid gas cap
-		{"gas exceed global allowance", func() {
+		{"gas below global allowance", func() {
 			args = types.TransactionArgs{To: &common.Address{}}
 			gasCap = 20000
 		}, false, 0, false},
@@ -613,13 +613,13 @@ func (suite *KeeperTestSuite) TestEstimateGas() {
 		{"not enough balance w/ enableFeemarket", func() {
 			args = types.TransactionArgs{To: &common.Address{}, Value: (*hexutil.Big)(new(big.Int).Mul(big.NewInt(100), types.DefaultStepUpDownRatio))}
 		}, false, 0, true},
-		{"enough balance w/ enableFeemarket", func() {
+		{"not enough balance w/ enableFeemarket", func() {
 			args = types.TransactionArgs{To: &common.Address{}, From: &suite.address, Value: (*hexutil.Big)(new(big.Int).Mul(big.NewInt(100), types.DefaultStepUpDownRatio))}
 		}, false, 0, true},
 		{"gas exceed allowance w/ enableFeemarket", func() {
 			args = types.TransactionArgs{To: &common.Address{}, Gas: &gasHelper}
 		}, true, 21000, true},
-		{"gas exceed global allowance w/ enableFeemarket", func() {
+		{"gas below global allowance w/ enableFeemarket", func() {
 			args = types.TransactionArgs{To: &common.Address{}}
 			gasCap = 20000
 		}, false, 0, true},
