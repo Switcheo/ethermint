@@ -1,6 +1,7 @@
 package ante_test
 
 import (
+	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
 	"math"
 	"math/big"
 	"testing"
@@ -104,10 +105,11 @@ func (suite *AnteTestSuite) SetupTest() {
 	encodingConfig.Amino.RegisterConcrete(&testdata.TestMsg{}, "testdata.TestMsg", nil)
 
 	suite.clientCtx = client.Context{}.WithTxConfig(encodingConfig.TxConfig)
+	placeholderBankKeeper := evmkeeper.BankKeeper{Keeper: suite.app.BankKeeper}
 
 	anteHandler, err := ante.NewAnteHandler(ante.HandlerOptions{
 		AccountKeeper:   suite.app.AccountKeeper,
-		BankKeeper:      suite.app.BankKeeper,
+		BankKeeper:      placeholderBankKeeper,
 		EvmKeeper:       suite.app.EvmKeeper,
 		FeegrantKeeper:  suite.app.FeeGrantKeeper,
 		IBCKeeper:       suite.app.IBCKeeper,

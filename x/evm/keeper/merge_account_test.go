@@ -35,7 +35,7 @@ var _ = Describe("Merge Account test", func() {
 		ctx = ethermintApp.BaseApp.NewContext(false, tmproto.Header{})
 		k = *ethermintApp.EvmKeeper
 		accountKeeper = ethermintApp.AccountKeeper
-		bankKeeper = ethermintApp.BankKeeper
+		bankKeeper = keeper.BankKeeper{Keeper: ethermintApp.BankKeeper}
 	})
 
 	Describe("Merge account from ETH account Scenario 1", func() {

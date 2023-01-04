@@ -347,10 +347,10 @@ func NewEthermintApp(
 	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(
 		appCodec, app.GetSubspace(feemarkettypes.ModuleName), keys[feemarkettypes.StoreKey], tkeys[feemarkettypes.TransientKey],
 	)
-
+	placeholderBankKeeper := evmkeeper.BankKeeper{Keeper: app.BankKeeper}
 	app.EvmKeeper = evmkeeper.NewKeeper(
 		appCodec, keys[evmtypes.StoreKey], tkeys[evmtypes.TransientKey], app.GetSubspace(evmtypes.ModuleName),
-		app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.FeeMarketKeeper,
+		app.AccountKeeper, placeholderBankKeeper, app.StakingKeeper, app.FeeMarketKeeper,
 		tracer,
 	)
 
@@ -573,7 +573,7 @@ func NewEthermintApp(
 	maxGasWanted := cast.ToUint64(appOpts.Get(srvflags.EVMMaxTxGasWanted))
 	anteHandler, err := ante.NewAnteHandler(ante.HandlerOptions{
 		AccountKeeper:   app.AccountKeeper,
-		BankKeeper:      app.BankKeeper,
+		BankKeeper:      placeholderBankKeeper,
 		EvmKeeper:       app.EvmKeeper,
 		FeegrantKeeper:  app.FeeGrantKeeper,
 		IBCKeeper:       app.IBCKeeper,
