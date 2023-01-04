@@ -110,7 +110,7 @@ func (k *Keeper) moveEthBankBalanceToCosmosAddress(ctx sdk.Context, ethAddress s
 		}
 	}
 	// Transfer any dust over as well
-	return k.bankKeeper.TransferEthSwthDust(ctx, ethAddress, cosmosAddress)
+	return k.bankKeeper.TransferEswthDust(ctx, ethAddress, cosmosAddress)
 }
 
 func (k *Keeper) AccountHasAlreadyBeenMerged(ctx sdk.Context, address sdk.AccAddress, isEthAddress bool) bool {
