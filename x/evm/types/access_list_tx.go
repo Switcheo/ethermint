@@ -224,14 +224,12 @@ func (tx AccessListTx) Validate() error {
 
 // Fee returns gasprice * gaslimit.
 func (tx AccessListTx) Fee() *big.Int {
-	steppedDownGasPrice := new(big.Int).Div(tx.GetGasPrice(), DefaultStepUpDownRatio)
-	return fee(steppedDownGasPrice, tx.GetGas())
+	return fee(tx.GetGasPrice(), tx.GetGas())
 }
 
 // Cost returns amount + gasprice * gaslimit.
 func (tx AccessListTx) Cost() *big.Int {
-	steppedDownValue := new(big.Int).Div(tx.GetValue(), DefaultStepUpDownRatio)
-	return cost(tx.Fee(), steppedDownValue)
+	return cost(tx.Fee(), tx.GetValue())
 }
 
 // EffectiveFee is the same as Fee for AccessListTx

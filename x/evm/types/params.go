@@ -20,8 +20,6 @@ var (
 	DefaultMinGasMultiplier = sdk.NewDecWithPrec(50, 2)
 	// DefaultAllowUnprotectedTxs rejects all unprotected txs (i.e false)
 	DefaultAllowUnprotectedTxs = false
-	// DefaultStepUpDownRatio = 10^10
-	DefaultStepUpDownRatio = new(big.Int).Exp(big.NewInt(10), big.NewInt(10), nil)
 )
 
 // Parameter keys

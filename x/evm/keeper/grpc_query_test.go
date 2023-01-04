@@ -572,11 +572,11 @@ func (suite *KeeperTestSuite) TestEstimateGas() {
 		}, true, 21000, false},
 		// should fail, because the default From address(zero address) don't have fund
 		{"not enough balance", func() {
-			args = types.TransactionArgs{To: &common.Address{}, Value: (*hexutil.Big)(new(big.Int).Mul(big.NewInt(100), types.DefaultStepUpDownRatio))}
+			args = types.TransactionArgs{To: &common.Address{}, Value: (*hexutil.Big)(big.NewInt(100))}
 		}, false, 0, false},
 		// should not success, not enough balance still
 		{"not enough balance", func() {
-			args = types.TransactionArgs{To: &common.Address{}, From: &suite.address, Value: (*hexutil.Big)(new(big.Int).Mul(big.NewInt(100), types.DefaultStepUpDownRatio))}
+			args = types.TransactionArgs{To: &common.Address{}, From: &suite.address, Value: (*hexutil.Big)(big.NewInt(100))}
 		}, false, 0, false},
 		// should success, because gas limit lower than 21000 is ignored
 		{"gas exceed allowance", func() {
@@ -611,10 +611,10 @@ func (suite *KeeperTestSuite) TestEstimateGas() {
 			args = types.TransactionArgs{To: &common.Address{}}
 		}, true, 21000, true},
 		{"not enough balance w/ enableFeemarket", func() {
-			args = types.TransactionArgs{To: &common.Address{}, Value: (*hexutil.Big)(new(big.Int).Mul(big.NewInt(100), types.DefaultStepUpDownRatio))}
+			args = types.TransactionArgs{To: &common.Address{}, Value: (*hexutil.Big)(big.NewInt(100))}
 		}, false, 0, true},
 		{"not enough balance w/ enableFeemarket", func() {
-			args = types.TransactionArgs{To: &common.Address{}, From: &suite.address, Value: (*hexutil.Big)(new(big.Int).Mul(big.NewInt(100), types.DefaultStepUpDownRatio))}
+			args = types.TransactionArgs{To: &common.Address{}, From: &suite.address, Value: (*hexutil.Big)(big.NewInt(100))}
 		}, false, 0, true},
 		{"gas exceed allowance w/ enableFeemarket", func() {
 			args = types.TransactionArgs{To: &common.Address{}, Gas: &gasHelper}

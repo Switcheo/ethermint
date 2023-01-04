@@ -573,14 +573,13 @@ func (suite *EvmTestSuite) TestERC20TransferReverted() {
 			suite.Require().NoError(err)
 
 			nonce := k.GetNonce(suite.ctx, suite.from)
-			steppedUpGasPrice := new(big.Int).Mul(big.NewInt(1), types.DefaultStepUpDownRatio)
 			tx := types.NewTx(
 				suite.chainID,
 				nonce,
 				&contract,
 				big.NewInt(0),
 				tc.gasLimit,
-				steppedUpGasPrice,
+				big.NewInt(1),
 				nil,
 				nil,
 				data,

@@ -336,10 +336,8 @@ func (e *PublicAPI) GasPrice() (*hexutil.Big, error) {
 	if result.Cmp(minGasPriceInt) < 0 {
 		result = minGasPriceInt
 	}
-	//Step up gasPrice for legacy txs
-	steppedUpGasPrice := new(big.Int).Mul(result, evmtypes.DefaultStepUpDownRatio)
 
-	return (*hexutil.Big)(steppedUpGasPrice), nil
+	return (*hexutil.Big)(result), nil
 }
 
 // EstimateGas returns an estimate of gas usage for the given smart contract call.

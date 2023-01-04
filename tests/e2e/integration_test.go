@@ -365,7 +365,7 @@ func (s *IntegrationTestSuite) TestGetBalance() {
 	initialBalance, err := s.network.Validators[0].JSONRPCClient.BalanceAt(s.ctx, common.HexToAddress("0x378c50D9264C63F3F92B806d4ee56E9D86FfB3Ed"), big.NewInt(int64(blockNumber)))
 	s.Require().NoError(err)
 
-	amountToTransfer := new(big.Int).Mul(big.NewInt(10), evmtypes.DefaultStepUpDownRatio)
+	amountToTransfer := big.NewInt(10)
 	signedTx := s.signValidTx(common.HexToAddress("0x378c50D9264C63F3F92B806d4ee56E9D86FfB3Ed"), amountToTransfer)
 	err = s.network.Validators[0].JSONRPCClient.SendTransaction(s.ctx, signedTx.AsTransaction())
 	s.Require().NoError(err)
@@ -786,10 +786,10 @@ func (s *IntegrationTestSuite) TestBatchETHTransactions() {
 			chainId,
 			nonce,
 			&recipient,
-			new(big.Int).Mul(big.NewInt(10), evmtypes.DefaultStepUpDownRatio),
+			big.NewInt(10),
 			100000,
-			gasPrice, //stepped up already as it is calling "eth_gasPrice" JSON-RPC
-			new(big.Int).Mul(big.NewInt(200), evmtypes.DefaultStepUpDownRatio),
+			gasPrice,
+			big.NewInt(200),
 			nil,
 			nil,
 			nil,

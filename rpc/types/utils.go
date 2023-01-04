@@ -131,8 +131,7 @@ func FormatBlock(
 	}
 
 	if baseFee != nil {
-		steppedUpBaseFee := new(big.Int).Mul(baseFee, new(big.Int).Exp(big.NewInt(10), big.NewInt(10), nil))
-		result["baseFeePerGas"] = (*hexutil.Big)(steppedUpBaseFee)
+		result["baseFeePerGas"] = (*hexutil.Big)(baseFee)
 	}
 
 	return result
