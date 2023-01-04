@@ -213,8 +213,8 @@ func (k *Keeper) DeleteAccount(ctx sdk.Context, addr common.Address) error {
 	return nil
 }
 
-// GetCorrespondingAddressIfExists is a custom method created in evmKeeper for stateDB to query account keeper for mapping
-func (k Keeper) GetCorrespondingAddressIfExists(ctx sdk.Context, addr common.Address) sdk.AccAddress {
+// GetMappedAccountAddressIfExists is a custom method created in evmKeeper for stateDB to query account keeper for mapping
+func (k Keeper) GetMappedAccountAddressIfExists(ctx sdk.Context, addr common.Address) sdk.AccAddress {
 	if corrAddr := k.accountKeeper.GetCorrespondingCosmosAddressIfExists(ctx, addr.Bytes()); corrAddr != nil {
 		return corrAddr
 	}

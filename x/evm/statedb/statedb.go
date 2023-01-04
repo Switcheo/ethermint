@@ -208,7 +208,7 @@ func (s *StateDB) getStateObject(addr common.Address) *stateObject {
 	}
 
 	// Return corresponding address stateObject if available
-	corrAddr := s.keeper.GetCorrespondingAddressIfExists(s.ctx, addr)
+	corrAddr := s.keeper.GetMappedAccountAddressIfExists(s.ctx, addr)
 	if corrAddr != nil && s.stateObjects[common.BytesToAddress(corrAddr)] != nil {
 		return s.stateObjects[common.BytesToAddress(corrAddr)]
 	}
