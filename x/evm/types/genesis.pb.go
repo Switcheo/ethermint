@@ -29,10 +29,6 @@ type GenesisState struct {
 	Accounts []GenesisAccount `protobuf:"bytes,1,rep,name=accounts,proto3" json:"accounts"`
 	// params defines all the parameters of the module.
 	Params Params `protobuf:"bytes,2,opt,name=params,proto3" json:"params"`
-	// eth-cosmos mapping from account keeper
-	EthToCosmosAddressMap map[string]string `protobuf:"bytes,3,rep,name=eth_to_cosmos_address_map,json=ethToCosmosAddressMap,proto3" json:"eth_to_cosmos_address_map" yaml:"eth_to_cosmos_address_map" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	// cosmos-eth mapping from account keeper
-	CosmosToEthAddressMap map[string]string `protobuf:"bytes,4,rep,name=cosmos_to_eth_address_map,json=cosmosToEthAddressMap,proto3" json:"cosmos_to_eth_address_map" yaml:"cosmos_to_eth_address_map" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
 func (m *GenesisState) Reset()         { *m = GenesisState{} }
@@ -80,20 +76,6 @@ func (m *GenesisState) GetParams() Params {
 		return m.Params
 	}
 	return Params{}
-}
-
-func (m *GenesisState) GetEthToCosmosAddressMap() map[string]string {
-	if m != nil {
-		return m.EthToCosmosAddressMap
-	}
-	return nil
-}
-
-func (m *GenesisState) GetCosmosToEthAddressMap() map[string]string {
-	if m != nil {
-		return m.CosmosToEthAddressMap
-	}
-	return nil
 }
 
 // GenesisAccount defines an account to be initialized in the genesis state.
@@ -164,43 +146,32 @@ func (m *GenesisAccount) GetStorage() Storage {
 
 func init() {
 	proto.RegisterType((*GenesisState)(nil), "ethermint.evm.v1.GenesisState")
-	proto.RegisterMapType((map[string]string)(nil), "ethermint.evm.v1.GenesisState.CosmosToEthAddressMapEntry")
-	proto.RegisterMapType((map[string]string)(nil), "ethermint.evm.v1.GenesisState.EthToCosmosAddressMapEntry")
 	proto.RegisterType((*GenesisAccount)(nil), "ethermint.evm.v1.GenesisAccount")
 }
 
 func init() { proto.RegisterFile("ethermint/evm/v1/genesis.proto", fileDescriptor_9bcdec50cc9d156d) }
 
 var fileDescriptor_9bcdec50cc9d156d = []byte{
-	// 448 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x93, 0x4f, 0x8e, 0xd3, 0x30,
-	0x14, 0xc6, 0xe3, 0x69, 0x98, 0x32, 0x1e, 0x04, 0x23, 0x6b, 0x46, 0x84, 0x2c, 0xd2, 0x28, 0x0b,
-	0x94, 0x55, 0xa2, 0x19, 0x24, 0x04, 0x5d, 0xd1, 0xa0, 0x0a, 0x36, 0x48, 0x28, 0xed, 0x8a, 0x4d,
-	0xe4, 0xa6, 0x56, 0x52, 0x51, 0xc7, 0x51, 0xec, 0x46, 0x64, 0xcb, 0x09, 0xb8, 0x00, 0x17, 0xe0,
-	0x24, 0x5d, 0x76, 0xc9, 0xaa, 0xa0, 0xf6, 0x06, 0x9c, 0x00, 0xd9, 0x49, 0xcb, 0x9f, 0x36, 0x82,
-	0xd9, 0x39, 0x7a, 0xdf, 0xf7, 0x7b, 0x9f, 0x5f, 0xfc, 0xa0, 0x45, 0x44, 0x4a, 0x0a, 0x3a, 0xcb,
-	0x84, 0x4f, 0x4a, 0xea, 0x97, 0xd7, 0x7e, 0x42, 0x32, 0xc2, 0x67, 0xdc, 0xcb, 0x0b, 0x26, 0x18,
-	0xba, 0xd8, 0xd7, 0x3d, 0x52, 0x52, 0xaf, 0xbc, 0x36, 0x2f, 0x13, 0x96, 0x30, 0x55, 0xf4, 0xe5,
-	0xa9, 0xd6, 0x99, 0xe6, 0x01, 0x47, 0xca, 0x55, 0xcd, 0x59, 0xeb, 0xf0, 0xde, 0xab, 0x9a, 0x3a,
-	0x12, 0x58, 0x10, 0x14, 0xc0, 0xbb, 0x38, 0x8e, 0xd9, 0x22, 0x13, 0xdc, 0x00, 0x76, 0xc7, 0x3d,
-	0xbf, 0xb1, 0xbd, 0xbf, 0xfb, 0x78, 0x8d, 0x63, 0x50, 0x0b, 0x03, 0x7d, 0xb9, 0xee, 0x69, 0xe1,
-	0xde, 0x87, 0x9e, 0xc2, 0xd3, 0x1c, 0x17, 0x98, 0x72, 0xe3, 0xc4, 0x06, 0xee, 0xf9, 0x8d, 0x71,
-	0x48, 0x78, 0xab, 0xea, 0x8d, 0xb3, 0x51, 0xa3, 0xcf, 0x00, 0x3e, 0x22, 0x22, 0x8d, 0x04, 0x8b,
-	0x62, 0xc6, 0x29, 0xe3, 0x11, 0x9e, 0x4e, 0x0b, 0xc2, 0x79, 0x44, 0x71, 0x6e, 0x74, 0x54, 0x9a,
-	0xe7, 0xad, 0x69, 0x54, 0x7e, 0x6f, 0x28, 0xd2, 0x31, 0x7b, 0xa9, 0xdc, 0x83, 0xda, 0xfc, 0x06,
-	0xe7, 0xc3, 0x4c, 0x14, 0x55, 0xe0, 0xca, 0x66, 0x3f, 0xd6, 0x3d, 0xbb, 0xc2, 0x74, 0xde, 0x77,
-	0x5a, 0x3b, 0x39, 0xe1, 0x15, 0x39, 0x46, 0x51, 0xf9, 0x1a, 0xb9, 0x60, 0x91, 0xf4, 0xff, 0x9e,
-	0x4f, 0xff, 0xaf, 0x7c, 0x35, 0x74, 0xcc, 0x86, 0x22, 0xfd, 0x47, 0xbe, 0xd6, 0x4e, 0x4e, 0x78,
-	0x15, 0x1f, 0xa3, 0x98, 0xaf, 0xa1, 0xd9, 0x7e, 0x7d, 0x74, 0x01, 0x3b, 0xef, 0x49, 0x65, 0x00,
-	0x1b, 0xb8, 0x67, 0xa1, 0x3c, 0xa2, 0x4b, 0x78, 0xa7, 0xc4, 0xf3, 0x05, 0x51, 0xbf, 0xe9, 0x2c,
-	0xac, 0x3f, 0xfa, 0x27, 0xcf, 0x80, 0x24, 0xb5, 0x07, 0xbd, 0x0d, 0xc9, 0xf9, 0x08, 0xe0, 0xfd,
-	0x3f, 0x9f, 0x0b, 0x32, 0x60, 0xb7, 0xb9, 0x4d, 0x83, 0xd8, 0x7d, 0x22, 0x04, 0xf5, 0x98, 0x4d,
-	0x77, 0x14, 0x75, 0x46, 0x01, 0xec, 0x72, 0xc1, 0x0a, 0x9c, 0x90, 0xe6, 0x05, 0x3c, 0x3c, 0x9c,
-	0xb0, 0x1a, 0x6d, 0xf0, 0x40, 0xce, 0xef, 0xcb, 0xb7, 0x5e, 0x77, 0x54, 0xeb, 0xc3, 0x9d, 0x31,
-	0x78, 0xb1, 0xdc, 0x58, 0x60, 0xb5, 0xb1, 0xc0, 0xf7, 0x8d, 0x05, 0x3e, 0x6d, 0x2d, 0x6d, 0xb5,
-	0xb5, 0xb4, 0xaf, 0x5b, 0x4b, 0x7b, 0xf7, 0x38, 0x99, 0x89, 0x74, 0x31, 0xf1, 0x62, 0x46, 0xe5,
-	0x56, 0x30, 0xee, 0xff, 0x5a, 0x96, 0x0f, 0x6a, 0x5d, 0x44, 0x95, 0x13, 0x3e, 0x39, 0x55, 0xeb,
-	0xf2, 0xe4, 0x67, 0x00, 0x00, 0x00, 0xff, 0xff, 0x82, 0xc3, 0xf9, 0x2c, 0x94, 0x03, 0x00, 0x00,
+	// 297 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x64, 0x50, 0xbf, 0x4e, 0x83, 0x40,
+	0x18, 0xe7, 0x6c, 0x53, 0xec, 0xd5, 0xa8, 0xb9, 0x98, 0x48, 0x18, 0xae, 0xa4, 0x83, 0x61, 0x3a,
+	0xd2, 0x9a, 0x38, 0x2b, 0x8b, 0xab, 0xa1, 0x9b, 0xdb, 0x15, 0xbe, 0x50, 0x06, 0x38, 0xc2, 0x5d,
+	0x89, 0xae, 0x8e, 0x4e, 0x3e, 0x87, 0x4f, 0xd2, 0xb1, 0xa3, 0x93, 0x1a, 0x78, 0x11, 0xc3, 0x41,
+	0x6b, 0x94, 0xed, 0xbb, 0xfc, 0xfe, 0xde, 0x0f, 0x53, 0x50, 0x6b, 0x28, 0xd2, 0x24, 0x53, 0x1e,
+	0x94, 0xa9, 0x57, 0xce, 0xbd, 0x18, 0x32, 0x90, 0x89, 0x64, 0x79, 0x21, 0x94, 0x20, 0xe7, 0x07,
+	0x9c, 0x41, 0x99, 0xb2, 0x72, 0x6e, 0x5f, 0xc4, 0x22, 0x16, 0x1a, 0xf4, 0x9a, 0xab, 0xe5, 0xd9,
+	0x76, 0xcf, 0xa7, 0xa1, 0x6b, 0x6c, 0xf6, 0x8a, 0xf0, 0xc9, 0x7d, 0xeb, 0xba, 0x54, 0x5c, 0x01,
+	0xf1, 0xf1, 0x31, 0x0f, 0x43, 0xb1, 0xc9, 0x94, 0xb4, 0x90, 0x33, 0x70, 0x27, 0x0b, 0x87, 0xfd,
+	0xcf, 0x61, 0x9d, 0xe2, 0xae, 0x25, 0xfa, 0xc3, 0xed, 0xe7, 0xd4, 0x08, 0x0e, 0x3a, 0x72, 0x83,
+	0x47, 0x39, 0x2f, 0x78, 0x2a, 0xad, 0x23, 0x07, 0xb9, 0x93, 0x85, 0xd5, 0x77, 0x78, 0xd0, 0x78,
+	0xa7, 0xec, 0xd8, 0xb3, 0x17, 0x84, 0x4f, 0xff, 0x5a, 0x13, 0x0b, 0x9b, 0x3c, 0x8a, 0x0a, 0x90,
+	0x4d, 0x1b, 0xe4, 0x8e, 0x83, 0xfd, 0x93, 0x10, 0x3c, 0x0c, 0x45, 0x04, 0x3a, 0x62, 0x1c, 0xe8,
+	0x9b, 0xf8, 0xd8, 0x94, 0x4a, 0x14, 0x3c, 0x06, 0x6b, 0xa0, 0xbb, 0x5f, 0xf6, 0x93, 0xf5, 0x37,
+	0xfd, 0xb3, 0x26, 0xf8, 0xfd, 0x6b, 0x6a, 0x2e, 0x5b, 0x7e, 0xb0, 0x17, 0xfa, 0xb7, 0xdb, 0x8a,
+	0xa2, 0x5d, 0x45, 0xd1, 0x77, 0x45, 0xd1, 0x5b, 0x4d, 0x8d, 0x5d, 0x4d, 0x8d, 0x8f, 0x9a, 0x1a,
+	0x8f, 0x57, 0x71, 0xa2, 0xd6, 0x9b, 0x15, 0x0b, 0x45, 0xda, 0x2c, 0x28, 0xa4, 0xf7, 0x3b, 0xec,
+	0x93, 0x9e, 0x56, 0x3d, 0xe7, 0x20, 0x57, 0x23, 0x3d, 0xed, 0xf5, 0x4f, 0x00, 0x00, 0x00, 0xff,
+	0xff, 0x0a, 0xad, 0x92, 0x3a, 0xc0, 0x01, 0x00, 0x00,
 }
 
 func (m *GenesisState) Marshal() (dAtA []byte, err error) {
@@ -223,44 +194,6 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.CosmosToEthAddressMap) > 0 {
-		for k := range m.CosmosToEthAddressMap {
-			v := m.CosmosToEthAddressMap[k]
-			baseI := i
-			i -= len(v)
-			copy(dAtA[i:], v)
-			i = encodeVarintGenesis(dAtA, i, uint64(len(v)))
-			i--
-			dAtA[i] = 0x12
-			i -= len(k)
-			copy(dAtA[i:], k)
-			i = encodeVarintGenesis(dAtA, i, uint64(len(k)))
-			i--
-			dAtA[i] = 0xa
-			i = encodeVarintGenesis(dAtA, i, uint64(baseI-i))
-			i--
-			dAtA[i] = 0x22
-		}
-	}
-	if len(m.EthToCosmosAddressMap) > 0 {
-		for k := range m.EthToCosmosAddressMap {
-			v := m.EthToCosmosAddressMap[k]
-			baseI := i
-			i -= len(v)
-			copy(dAtA[i:], v)
-			i = encodeVarintGenesis(dAtA, i, uint64(len(v)))
-			i--
-			dAtA[i] = 0x12
-			i -= len(k)
-			copy(dAtA[i:], k)
-			i = encodeVarintGenesis(dAtA, i, uint64(len(k)))
-			i--
-			dAtA[i] = 0xa
-			i = encodeVarintGenesis(dAtA, i, uint64(baseI-i))
-			i--
-			dAtA[i] = 0x1a
-		}
-	}
 	{
 		size, err := m.Params.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
@@ -364,22 +297,6 @@ func (m *GenesisState) Size() (n int) {
 	}
 	l = m.Params.Size()
 	n += 1 + l + sovGenesis(uint64(l))
-	if len(m.EthToCosmosAddressMap) > 0 {
-		for k, v := range m.EthToCosmosAddressMap {
-			_ = k
-			_ = v
-			mapEntrySize := 1 + len(k) + sovGenesis(uint64(len(k))) + 1 + len(v) + sovGenesis(uint64(len(v)))
-			n += mapEntrySize + 1 + sovGenesis(uint64(mapEntrySize))
-		}
-	}
-	if len(m.CosmosToEthAddressMap) > 0 {
-		for k, v := range m.CosmosToEthAddressMap {
-			_ = k
-			_ = v
-			mapEntrySize := 1 + len(k) + sovGenesis(uint64(len(k))) + 1 + len(v) + sovGenesis(uint64(len(v)))
-			n += mapEntrySize + 1 + sovGenesis(uint64(mapEntrySize))
-		}
-	}
 	return n
 }
 
@@ -507,260 +424,6 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			if err := m.Params.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field EthToCosmosAddressMap", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenesis
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.EthToCosmosAddressMap == nil {
-				m.EthToCosmosAddressMap = make(map[string]string)
-			}
-			var mapkey string
-			var mapvalue string
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowGenesis
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					wire |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowGenesis
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthGenesis
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey < 0 {
-						return ErrInvalidLengthGenesis
-					}
-					if postStringIndexmapkey > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					var stringLenmapvalue uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowGenesis
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapvalue |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 {
-						return ErrInvalidLengthGenesis
-					}
-					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue < 0 {
-						return ErrInvalidLengthGenesis
-					}
-					if postStringIndexmapvalue > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
-					iNdEx = postStringIndexmapvalue
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipGenesis(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if (skippy < 0) || (iNdEx+skippy) < 0 {
-						return ErrInvalidLengthGenesis
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
-				}
-			}
-			m.EthToCosmosAddressMap[mapkey] = mapvalue
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CosmosToEthAddressMap", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGenesis
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGenesis
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.CosmosToEthAddressMap == nil {
-				m.CosmosToEthAddressMap = make(map[string]string)
-			}
-			var mapkey string
-			var mapvalue string
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowGenesis
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					wire |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowGenesis
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthGenesis
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey < 0 {
-						return ErrInvalidLengthGenesis
-					}
-					if postStringIndexmapkey > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					var stringLenmapvalue uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowGenesis
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapvalue |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 {
-						return ErrInvalidLengthGenesis
-					}
-					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue < 0 {
-						return ErrInvalidLengthGenesis
-					}
-					if postStringIndexmapvalue > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
-					iNdEx = postStringIndexmapvalue
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipGenesis(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if (skippy < 0) || (iNdEx+skippy) < 0 {
-						return ErrInvalidLengthGenesis
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
-				}
-			}
-			m.CosmosToEthAddressMap[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

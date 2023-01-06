@@ -16,18 +16,10 @@ import (
 type AccountKeeper interface {
 	NewAccountWithAddress(ctx sdk.Context, addr sdk.AccAddress) authtypes.AccountI
 	GetModuleAddress(moduleName string) sdk.AccAddress
-	GetAllAccounts(ctx sdk.Context) (accounts []authtypes.AccountI)
 	IterateAccounts(ctx sdk.Context, cb func(account authtypes.AccountI) bool)
-	IterateEthToCosmosAddressMapping(sdk.Context, func(ethAddress, cosmosAddress sdk.AccAddress) bool)
-	IterateCosmosToEthAddressMapping(sdk.Context, func(cosmosAddress, ethAddress sdk.AccAddress) bool)
-	GetSequence(sdk.Context, sdk.AccAddress) (uint64, error)
-	HasExactAccount(ctx sdk.Context, addr sdk.AccAddress) bool
 	GetAccount(ctx sdk.Context, addr sdk.AccAddress) authtypes.AccountI
 	GetCorrespondingEthAddressIfExists(ctx sdk.Context, addr sdk.AccAddress) (correspondingAddr sdk.AccAddress)
 	GetCorrespondingCosmosAddressIfExists(ctx sdk.Context, addr sdk.AccAddress) (correspondingAddr sdk.AccAddress)
-	SetCorrespondingAddresses(ctx sdk.Context, cosmosAddr sdk.AccAddress, ethAddr sdk.AccAddress)
-	AddToCosmosToEthAddressMap(ctx sdk.Context, cosmosAddr sdk.AccAddress, ethAddr sdk.AccAddress)
-	AddToEthToCosmosAddressMap(ctx sdk.Context, ethAddr sdk.AccAddress, cosmosAddr sdk.AccAddress)
 	SetAccount(ctx sdk.Context, account authtypes.AccountI)
 	RemoveAccount(ctx sdk.Context, account authtypes.AccountI)
 	GetParams(ctx sdk.Context) (params authtypes.Params)
@@ -36,14 +28,12 @@ type AccountKeeper interface {
 // BankKeeper defines the expected interface needed to retrieve account balances.
 type BankKeeper interface {
 	GetBalance(ctx sdk.Context, addr sdk.AccAddress, denom string) sdk.Coin
-	GetAllBalances(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 	SendCoins(ctx sdk.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) error
 	SendCoinsFromModuleToAccount(ctx sdk.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error
 	// SendCoinsFromModuleToModule(ctx sdk.Context, senderModule, recipientModule string, amt sdk.Coins) error
 	SendCoinsFromAccountToModule(ctx sdk.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) error
 	MintCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) error
 	BurnCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) error
-	TransferEswthDust(ctx sdk.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress) error
 }
 
 // StakingKeeper returns the historical headers kept in store.

@@ -29,7 +29,6 @@ type EVMKeeper interface {
 	GetBalance(ctx sdk.Context, addr common.Address) *big.Int
 	ResetTransientGasUsed(ctx sdk.Context)
 	GetTxIndexTransient(ctx sdk.Context) uint64
-	AccountHasAlreadyBeenMerged(ctx sdk.Context, address sdk.AccAddress, isEthAddress bool) bool
 }
 
 type protoTxProvider interface {

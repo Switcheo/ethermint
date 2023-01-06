@@ -15,23 +15,8 @@ service Msg {
   rpc EthereumTx(MsgEthereumTx) returns (MsgEthereumTxResponse) {
     option (google.api.http).post = "/ethermint/evm/v1/ethereum_tx";
   };
-  rpc MergeAccount(MsgMergeAccount) returns (MsgMergeAccountResponse);
 }
 
-message MsgMergeAccount {
-  option (gogoproto.goproto_getters) = false;
-  //bech32 ETH address if coming from EIP-712, bech32 cosmos address if coming from typical cosmos tx
-  string creator = 1;
-  //Compressed Public key in hex eg 034a1e1f95ebb49bc59b3c2d60afbb4c2fb2b77cd1f1e2322123fdacaa3d12f7a9
-  string pub_key = 2 [(gogoproto.moretags) = "yaml:\"pub_key\""];
-  //corresponds to creator
-  bool is_eth_address = 3 [(gogoproto.moretags) = "yaml:\"is_eth_address\""];
-
-}
-
-
-message MsgMergeAccountResponse {
-}
 
 // MsgEthereumTx encapsulates an Ethereum transaction as an SDK message.
 message MsgEthereumTx {

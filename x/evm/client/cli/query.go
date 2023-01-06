@@ -24,7 +24,6 @@ func GetQueryCmd() *cobra.Command {
 		GetStorageCmd(),
 		GetCodeCmd(),
 		GetParamsCmd(),
-		GetMergedAccounts(),
 	)
 
 	return cmd

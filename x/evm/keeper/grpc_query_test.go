@@ -3,8 +3,6 @@ package keeper_test
 import (
 	"encoding/json"
 	"fmt"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/evmos/ethermint/testutil/test"
 	types2 "github.com/evmos/ethermint/x/feemarket/types"
 	"math/big"
 
@@ -25,69 +23,6 @@ import (
 
 // Not valid Ethereum address
 const invalidAddress = "0x0000"
-
-func (suite *KeeperTestSuite) TestMergedAccountsAddressMappings() {
-	var (
-		request *types.QueryMergedAccountsMappingRequest
-	)
-
-	testCases := []struct {
-		msg       string
-		malleate  func()
-		expPass   bool
-		passCheck func(*types.QueryMergedAccountsMappingResponse)
-	}{
-		{
-			"get Merged Accounts address should be what is stored in the account keeper",
-			func() {
-				suite.app.AccountKeeper.SetCorrespondingAddresses(suite.ctx, test.Maker1, test.Maker2)
-			},
-			true,
-			func(response *types.QueryMergedAccountsMappingResponse) {
-				ethCosmosMap := suite.app.AccountKeeper.Store(suite.ctx, authtypes.EthAddressToCosmosAddressKey)
-				cosmosEthMap := suite.app.AccountKeeper.Store(suite.ctx, authtypes.CosmosAddressToEthAddressKey)
-
-				itr := ethCosmosMap.Iterator(nil, nil)
-				defer itr.Close()
-				var ethCosmosMapSize int
-				for ; itr.Valid(); itr.Next() {
-					ethCosmosMapSize++
-				}
-
-				itr2 := cosmosEthMap.Iterator(nil, nil)
-				defer itr2.Close()
-				var cosmosEthMapSize int
-				for ; itr2.Valid(); itr2.Next() {
-					cosmosEthMapSize++
-				}
-				suite.Require().Equal(cosmosEthMapSize, len(response.CosmosToEthAddressMap))
-				suite.Require().Equal(ethCosmosMapSize, len(response.EthToCosmosAddressMap))
-
-				suite.Require().Equal(sdk.AccAddress(ethCosmosMap.Get(test.Maker1)).String(), response.EthToCosmosAddressMap[test.Maker1.String()])
-				suite.Require().Equal(sdk.AccAddress(cosmosEthMap.Get(test.Maker2)).String(), response.CosmosToEthAddressMap[test.Maker2.String()])
-
-			},
-		},
-	}
-
-	for _, tc := range testCases {
-		suite.Run(fmt.Sprintf("Case %s", tc.msg), func() {
-			suite.SetupTest() // reset
-
-			tc.malleate()
-			ctx := sdk.WrapSDKContext(suite.ctx)
-			res, err := suite.queryClient.MergedAccountsAddressMappings(ctx, request)
-
-			if tc.expPass {
-				suite.Require().NoError(err)
-				suite.Require().NotNil(res)
-				tc.passCheck(res)
-			} else {
-				suite.Require().Error(err)
-			}
-		})
-	}
-}
 
 func (suite *KeeperTestSuite) TestQueryAccount() {
 	var (

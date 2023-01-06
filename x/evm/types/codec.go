@@ -33,7 +33,6 @@ func init() {
 }
 
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgMergeAccount{}, "evm/v1/MsgMergeAccount", nil)
 	cdc.RegisterConcrete(&MsgEthereumTx{}, "evm/v1/MsgEthereumTx", nil)
 	cdc.RegisterConcrete(&ExtensionOptionsEthereumTx{}, "evm/v1/ExtensionOptionsEthereumTx", nil)
 	cdc.RegisterConcrete(&DynamicFeeTx{}, "evm/v1/DynamicFeeTx", nil)
@@ -48,7 +47,6 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	registry.RegisterImplementations(
 		(*sdk.Msg)(nil),
 		&MsgEthereumTx{},
-		&MsgMergeAccount{},
 	)
 	registry.RegisterInterface(
 		"ethermint.evm.v1.ExtensionOptionsEthereumTx",

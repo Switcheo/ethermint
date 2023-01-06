@@ -35,28 +35,6 @@ const (
 	defaultTraceTimeout = 5 * time.Second
 )
 
-func (k Keeper) MergedAccountsAddressMappings(c context.Context, _ *types.QueryMergedAccountsMappingRequest) (*types.QueryMergedAccountsMappingResponse, error) {
-	ctx := sdk.UnwrapSDKContext(c)
-
-	cosmosToEthAddressMap := make(map[string]string)
-	ethToCosmosAddressMap := make(map[string]string)
-
-	k.accountKeeper.IterateCosmosToEthAddressMapping(ctx, func(cosmosAddress, ethAddress sdk.AccAddress) bool {
-		cosmosToEthAddressMap[cosmosAddress.String()] = ethAddress.String()
-		return false
-	})
-	k.accountKeeper.IterateEthToCosmosAddressMapping(ctx, func(ethAddress, cosmosAddress sdk.AccAddress) bool {
-		ethToCosmosAddressMap[ethAddress.String()] = cosmosAddress.String()
-		return false
-	})
-
-	return &types.QueryMergedAccountsMappingResponse{
-		EthToCosmosAddressMap: ethToCosmosAddressMap,
-		CosmosToEthAddressMap: cosmosToEthAddressMap,
-	}, nil
-
-}
-
 // Account implements the Query/Account gRPC method
 func (k Keeper) Account(c context.Context, req *types.QueryAccountRequest) (*types.QueryAccountResponse, error) {
 	if req == nil {

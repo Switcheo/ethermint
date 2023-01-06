@@ -8,9 +8,6 @@
     - [PrivKey](#ethermint.crypto.v1.ethsecp256k1.PrivKey)
     - [PubKey](#ethermint.crypto.v1.ethsecp256k1.PubKey)
   
-- [ethermint/evm/v1/event.proto](#ethermint/evm/v1/event.proto)
-    - [MergeAccountEvent](#ethermint.evm.v1.MergeAccountEvent)
-  
 - [ethermint/evm/v1/evm.proto](#ethermint/evm/v1/evm.proto)
     - [AccessTuple](#ethermint.evm.v1.AccessTuple)
     - [ChainConfig](#ethermint.evm.v1.ChainConfig)
@@ -24,8 +21,6 @@
 - [ethermint/evm/v1/genesis.proto](#ethermint/evm/v1/genesis.proto)
     - [GenesisAccount](#ethermint.evm.v1.GenesisAccount)
     - [GenesisState](#ethermint.evm.v1.GenesisState)
-    - [GenesisState.CosmosToEthAddressMapEntry](#ethermint.evm.v1.GenesisState.CosmosToEthAddressMapEntry)
-    - [GenesisState.EthToCosmosAddressMapEntry](#ethermint.evm.v1.GenesisState.EthToCosmosAddressMapEntry)
   
 - [ethermint/evm/v1/tx.proto](#ethermint/evm/v1/tx.proto)
     - [AccessListTx](#ethermint.evm.v1.AccessListTx)
@@ -34,8 +29,6 @@
     - [LegacyTx](#ethermint.evm.v1.LegacyTx)
     - [MsgEthereumTx](#ethermint.evm.v1.MsgEthereumTx)
     - [MsgEthereumTxResponse](#ethermint.evm.v1.MsgEthereumTxResponse)
-    - [MsgMergeAccount](#ethermint.evm.v1.MsgMergeAccount)
-    - [MsgMergeAccountResponse](#ethermint.evm.v1.MsgMergeAccountResponse)
   
     - [Msg](#ethermint.evm.v1.Msg)
   
@@ -52,10 +45,6 @@
     - [QueryCodeResponse](#ethermint.evm.v1.QueryCodeResponse)
     - [QueryCosmosAccountRequest](#ethermint.evm.v1.QueryCosmosAccountRequest)
     - [QueryCosmosAccountResponse](#ethermint.evm.v1.QueryCosmosAccountResponse)
-    - [QueryMergedAccountsMappingRequest](#ethermint.evm.v1.QueryMergedAccountsMappingRequest)
-    - [QueryMergedAccountsMappingResponse](#ethermint.evm.v1.QueryMergedAccountsMappingResponse)
-    - [QueryMergedAccountsMappingResponse.CosmosToEthAddressMapEntry](#ethermint.evm.v1.QueryMergedAccountsMappingResponse.CosmosToEthAddressMapEntry)
-    - [QueryMergedAccountsMappingResponse.EthToCosmosAddressMapEntry](#ethermint.evm.v1.QueryMergedAccountsMappingResponse.EthToCosmosAddressMapEntry)
     - [QueryParamsRequest](#ethermint.evm.v1.QueryParamsRequest)
     - [QueryParamsResponse](#ethermint.evm.v1.QueryParamsResponse)
     - [QueryStorageRequest](#ethermint.evm.v1.QueryStorageRequest)
@@ -134,39 +123,6 @@ key format.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `key` | [bytes](#bytes) |  |  |
-
-
-
-
-
- <!-- end messages -->
-
- <!-- end enums -->
-
- <!-- end HasExtensions -->
-
- <!-- end services -->
-
-
-
-<a name="ethermint/evm/v1/event.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## ethermint/evm/v1/event.proto
-
-
-
-<a name="ethermint.evm.v1.MergeAccountEvent"></a>
-
-### MergeAccountEvent
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `eth_address` | [string](#string) |  |  |
-| `cosmos_address` | [string](#string) |  |  |
-| `new_cosmos_acc_created` | [bool](#bool) |  |  |
 
 
 
@@ -405,40 +361,6 @@ GenesisState defines the evm module's genesis state.
 | ----- | ---- | ----- | ----------- |
 | `accounts` | [GenesisAccount](#ethermint.evm.v1.GenesisAccount) | repeated | accounts is an array containing the ethereum genesis accounts. |
 | `params` | [Params](#ethermint.evm.v1.Params) |  | params defines all the parameters of the module. |
-| `eth_to_cosmos_address_map` | [GenesisState.EthToCosmosAddressMapEntry](#ethermint.evm.v1.GenesisState.EthToCosmosAddressMapEntry) | repeated | eth-cosmos mapping from account keeper |
-| `cosmos_to_eth_address_map` | [GenesisState.CosmosToEthAddressMapEntry](#ethermint.evm.v1.GenesisState.CosmosToEthAddressMapEntry) | repeated | cosmos-eth mapping from account keeper |
-
-
-
-
-
-
-<a name="ethermint.evm.v1.GenesisState.CosmosToEthAddressMapEntry"></a>
-
-### GenesisState.CosmosToEthAddressMapEntry
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `key` | [string](#string) |  |  |
-| `value` | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="ethermint.evm.v1.GenesisState.EthToCosmosAddressMapEntry"></a>
-
-### GenesisState.EthToCosmosAddressMapEntry
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `key` | [string](#string) |  |  |
-| `value` | [string](#string) |  |  |
 
 
 
@@ -585,33 +507,6 @@ MsgEthereumTxResponse defines the Msg/EthereumTx response type.
 
 
 
-
-<a name="ethermint.evm.v1.MsgMergeAccount"></a>
-
-### MsgMergeAccount
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `creator` | [string](#string) |  | bech32 ETH address if coming from EIP-712, bech32 cosmos address if coming from typical cosmos tx |
-| `pub_key` | [string](#string) |  | Compressed Public key in hex eg 034a1e1f95ebb49bc59b3c2d60afbb4c2fb2b77cd1f1e2322123fdacaa3d12f7a9 |
-| `is_eth_address` | [bool](#bool) |  | corresponds to creator |
-
-
-
-
-
-
-<a name="ethermint.evm.v1.MsgMergeAccountResponse"></a>
-
-### MsgMergeAccountResponse
-
-
-
-
-
-
  <!-- end messages -->
 
  <!-- end enums -->
@@ -627,7 +522,6 @@ Msg defines the evm Msg service.
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
 | `EthereumTx` | [MsgEthereumTx](#ethermint.evm.v1.MsgEthereumTx) | [MsgEthereumTxResponse](#ethermint.evm.v1.MsgEthereumTxResponse) | EthereumTx defines a method submitting Ethereum transactions. | POST|/ethermint/evm/v1/ethereum_tx|
-| `MergeAccount` | [MsgMergeAccount](#ethermint.evm.v1.MsgMergeAccount) | [MsgMergeAccountResponse](#ethermint.evm.v1.MsgMergeAccountResponse) |  | |
 
  <!-- end services -->
 
@@ -818,64 +712,6 @@ RPC method.
 | `cosmos_address` | [string](#string) |  | cosmos_address is the cosmos address of the account. |
 | `sequence` | [uint64](#uint64) |  | sequence is the account's sequence number. |
 | `account_number` | [uint64](#uint64) |  | account_number is the account numbert |
-
-
-
-
-
-
-<a name="ethermint.evm.v1.QueryMergedAccountsMappingRequest"></a>
-
-### QueryMergedAccountsMappingRequest
-QueryMergedAccountsMappingRequest is the request type for the Query/MergeAccountsAddressMappings RPC method.
-
-
-
-
-
-
-<a name="ethermint.evm.v1.QueryMergedAccountsMappingResponse"></a>
-
-### QueryMergedAccountsMappingResponse
-QueryMergedAccountsMappingResponse is the response type for the Query/MergeAccountsAddressMappings RPC method.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `eth_to_cosmos_address_map` | [QueryMergedAccountsMappingResponse.EthToCosmosAddressMapEntry](#ethermint.evm.v1.QueryMergedAccountsMappingResponse.EthToCosmosAddressMapEntry) | repeated | eth-cosmos mapping from account keeper |
-| `cosmos_to_eth_address_map` | [QueryMergedAccountsMappingResponse.CosmosToEthAddressMapEntry](#ethermint.evm.v1.QueryMergedAccountsMappingResponse.CosmosToEthAddressMapEntry) | repeated | cosmos-eth mapping from account keeper |
-
-
-
-
-
-
-<a name="ethermint.evm.v1.QueryMergedAccountsMappingResponse.CosmosToEthAddressMapEntry"></a>
-
-### QueryMergedAccountsMappingResponse.CosmosToEthAddressMapEntry
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `key` | [string](#string) |  |  |
-| `value` | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="ethermint.evm.v1.QueryMergedAccountsMappingResponse.EthToCosmosAddressMapEntry"></a>
-
-### QueryMergedAccountsMappingResponse.EthToCosmosAddressMapEntry
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `key` | [string](#string) |  |  |
-| `value` | [string](#string) |  |  |
 
 
 
@@ -1087,7 +923,6 @@ Query defines the gRPC querier service.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `MergedAccountsAddressMappings` | [QueryMergedAccountsMappingRequest](#ethermint.evm.v1.QueryMergedAccountsMappingRequest) | [QueryMergedAccountsMappingResponse](#ethermint.evm.v1.QueryMergedAccountsMappingResponse) | MergedAccountsAddressMappings queries current address mappings for merged accounts. | GET|/ethermint/evm/v1/address_mappings|
 | `Account` | [QueryAccountRequest](#ethermint.evm.v1.QueryAccountRequest) | [QueryAccountResponse](#ethermint.evm.v1.QueryAccountResponse) | Account queries an Ethereum account. | GET|/ethermint/evm/v1/account/{address}|
 | `CosmosAccount` | [QueryCosmosAccountRequest](#ethermint.evm.v1.QueryCosmosAccountRequest) | [QueryCosmosAccountResponse](#ethermint.evm.v1.QueryCosmosAccountResponse) | CosmosAccount queries an Ethereum account's Cosmos Address. | GET|/ethermint/evm/v1/cosmos_account/{address}|
 | `ValidatorAccount` | [QueryValidatorAccountRequest](#ethermint.evm.v1.QueryValidatorAccountRequest) | [QueryValidatorAccountResponse](#ethermint.evm.v1.QueryValidatorAccountResponse) | ValidatorAccount queries an Ethereum account's from a validator consensus Address. | GET|/ethermint/evm/v1/validator_account/{cons_address}|
