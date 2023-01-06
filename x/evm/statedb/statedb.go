@@ -207,11 +207,16 @@ func (s *StateDB) getStateObject(addr common.Address) *stateObject {
 		return obj
 	}
 
-	// Return corresponding address stateObject if available
-	corrAddr := s.keeper.GetMappedAccountAddressIfExists(s.ctx, addr)
+	// Return corresponding cosmos address stateObject if available
+	corrAddr := s.keeper.GetCorrespondingCosmosAddressIfExists(s.ctx, addr)
 	if corrAddr != nil && s.stateObjects[common.BytesToAddress(corrAddr)] != nil {
 		return s.stateObjects[common.BytesToAddress(corrAddr)]
 	}
+
+	if corrAddr != nil {
+		addr = common.BytesToAddress(corrAddr)
+	}
+
 	// If no live objects are available, load it from keeper
 	account := s.keeper.GetAccount(s.ctx, addr)
 	if account == nil {
