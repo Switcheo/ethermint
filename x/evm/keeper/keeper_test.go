@@ -413,7 +413,7 @@ func (suite *KeeperTestSuite) TestBaseFee() {
 	}{
 		{"not enable london HF, not enable feemarket", false, false, nil},
 		{"enable london HF, not enable feemarket", true, false, big.NewInt(0)},
-		{"enable london HF, enable feemarket", true, true, big.NewInt(75000)},
+		{"enable london HF, enable feemarket", true, true, big.NewInt(params.InitialBaseFee)},
 		{"not enable london HF, enable feemarket", false, true, nil},
 	}
 

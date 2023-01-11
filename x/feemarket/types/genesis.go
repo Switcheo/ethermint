@@ -1,7 +1,16 @@
 package types
 
+var LocalEthermintRun string
+
 // DefaultGenesisState sets default fee market genesis state.
 func DefaultGenesisState() *GenesisState {
+	if LocalEthermintRun == "true" {
+		return &GenesisState{
+			Params:   DefaultEthermintTestParams(),
+			BlockGas: 0,
+		}
+	}
+
 	return &GenesisState{
 		Params:   DefaultParams(),
 		BlockGas: 0,

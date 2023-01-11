@@ -66,12 +66,13 @@ PROJECT_DIR=github.com/evmos/ethermint
 
 ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=ethermint \
 		  -X '${PROJECT_DIR}/x/evm/keeper.EvmChainId=ethermint_9000-1' \
-		   -X '${PROJECT_DIR}/x/evm/types.DefaultEVMDenom=aphoton' \
+		  -X '${PROJECT_DIR}/x/evm/types.DefaultEVMDenom=aphoton' \
+		  -X '${PROJECT_DIR}/x/feemarket/types.LocalEthermintRun=true' \
 		  -X github.com/cosmos/cosmos-sdk/version.AppName=$(ETHERMINT_BINARY) \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-			-X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
-			-X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TMVERSION)
+		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
+		  -X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TMVERSION)
 
 
 # DB backend selection

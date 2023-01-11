@@ -71,6 +71,20 @@ func DefaultParams() Params {
 	}
 }
 
+// DefaultEthermintTestParams returns default evm parameters for local testing
+func DefaultEthermintTestParams() Params {
+	return Params{
+		NoBaseFee:                false,
+		BaseFeeChangeDenominator: params.BaseFeeChangeDenominator,
+		ElasticityMultiplier:     params.ElasticityMultiplier,
+		BaseFee:                  sdk.NewIntFromUint64(params.InitialBaseFee),
+		EnableHeight:             0,
+		MinGasPrice:              sdk.ZeroDec(),
+		MinGasMultiplier:         DefaultMinGasMultiplier,
+		GasLimitPerBlock:         DefaultGasLimitPerBlock,
+	}
+}
+
 // ParamSetPairs returns the parameter set pairs.
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{

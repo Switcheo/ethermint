@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"encoding/json"
 	"fmt"
-	types2 "github.com/evmos/ethermint/x/feemarket/types"
+	"github.com/ethereum/go-ethereum/params"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -923,7 +923,7 @@ func (suite *KeeperTestSuite) TestQueryBaseFee() {
 		{
 			"pass - default Base Fee",
 			func() {
-				initialBaseFee := sdk.NewInt(types2.DefaultInitialBaseFee.Int64())
+				initialBaseFee := sdk.NewInt(params.InitialBaseFee)
 				expRes = &types.QueryBaseFeeResponse{BaseFee: &initialBaseFee}
 			},
 			true, true, true,
