@@ -113,7 +113,7 @@ func (empd EthMinGasPriceDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 		// that lowers EffectivePrice until it is < MinGasPrices, the users must
 		// increase the GasTipCap (priority fee) until EffectivePrice > MinGasPrices.
 		// Transactions with MinGasPrices * gasUsed < tx fees < EffectiveFee are rejected
-		// by the feemarket AnteHandle
+		// by the feemarket AnteHandle (refer to default Ethermint EthMempoolFeeDecorator)
 
 		txData, err := evmtypes.UnpackTxData(ethMsg.Data)
 		if err != nil {
