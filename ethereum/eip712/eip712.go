@@ -301,7 +301,7 @@ func traverseFields(
 		fieldPrefix := fmt.Sprintf("%s.%s", prefix, fieldName)
 
 		ethTyp := typToEth(fieldType)
-		if len(ethTyp) > 0 && !removeJsonOmitEmptyFromTypesDefinition(field) {
+		if len(ethTyp) > 0 && !removeJsonOmitEmptyFieldFromTypesDefinition(field) {
 			// Support array of uint64
 			if isCollection && fieldType.Kind() != reflect.Slice && fieldType.Kind() != reflect.Array {
 				ethTyp += "[]"
@@ -470,7 +470,7 @@ func doRecover(err *error) {
 // Removes field from typesData.Types definition if that field will be omitted(json:omitempty) during json unmarshal(WrapTxToTypedData) for signature verification later
 // Requires client signing to be consistent with the removal as well
 // Empty structs are not ignored in omitempty and therefore should still be included in typesData.Types definition
-func removeJsonOmitEmptyFromTypesDefinition(field reflect.Value) bool {
+func removeJsonOmitEmptyFieldFromTypesDefinition(field reflect.Value) bool {
 	return field.IsZero() && field.Kind() != reflect.Struct
 
 }
