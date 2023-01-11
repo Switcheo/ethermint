@@ -2,7 +2,6 @@ package types
 
 import (
 	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/ethereum/go-ethereum/params"
@@ -25,9 +24,9 @@ var (
 var (
 	// DefaultMinGasMultiplier is 0.5 or 50%
 	DefaultMinGasMultiplier = sdk.NewDecWithPrec(50, 2)
-	DefaultMinGasPrice      = sdk.NewDec(50000)
-	DefaultGasLimitPerBlock = sdk.NewInt(10000000)
-	DefaultInitialBaseFee   = sdk.NewInt(75000)
+	DefaultMinGasPrice      = sdk.NewDec(50_000_000_000_000)
+	DefaultGasLimitPerBlock = sdk.NewInt(10_000_000)
+	DefaultInitialBaseFee   = sdk.NewInt(50_000_000_000_000)
 )
 
 // ParamKeyTable returns the parameter key table.
