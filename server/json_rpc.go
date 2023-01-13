@@ -105,6 +105,6 @@ func StartJSONRPC(ctx *server.Context, clientCtx client.Context, tmRPCAddr, tmEn
 	tmWsClient = ConnectTmWS(tmRPCAddr, tmEndpoint, ctx.Logger)
 	wsSrv := rpc.NewWebsocketsServer(clientCtx, ctx.Logger, tmWsClient, config)
 	wsSrv.Start()
-	logrus.Info(fmt.Sprintf("EVM JSON RPC started"))
+	logrus.Info(fmt.Sprintf("[carbon:app] EVM JSON RPC started"))
 	return httpSrv, httpSrvDone, nil
 }
