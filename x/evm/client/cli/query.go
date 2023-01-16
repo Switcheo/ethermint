@@ -25,7 +25,6 @@ func GetQueryCmd() *cobra.Command {
 		GetCodeCmd(),
 		GetParamsCmd(),
 	)
-
 	return cmd
 }
 

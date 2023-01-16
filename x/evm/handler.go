@@ -17,6 +17,7 @@ func NewHandler(server types.MsgServer) sdk.Handler {
 			// execute state transition
 			res, err := server.EthereumTx(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
+
 		default:
 			err := sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
 			return nil, err

@@ -79,8 +79,7 @@ Example:
 	f.Uint32(flagCoinType, sdk.GetConfig().GetCoinType(), "coin type number for HD derivation")
 	f.Uint32(flagAccount, 0, "Account number for HD derivation")
 	f.Uint32(flagIndex, 0, "Address index number for HD derivation")
-	f.String(flags.FlagKeyAlgorithm, string(hd.Secp256k1Type), fmt.Sprintf("Key signing algorithm to generate keys for. Current Available algos include %q", []string{string(hd.Secp256k1Type), string(etherminthd.EthSecp256k1Type)}))
-
+	f.String(flags.FlagKeyAlgorithm, string(etherminthd.EthSecp256k1Type), "Key signing algorithm to generate keys for")
 	return cmd
 }
 

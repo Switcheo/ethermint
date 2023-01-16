@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+
 	ethermint "github.com/evmos/ethermint/types"
 )
 
@@ -43,5 +44,6 @@ func (gs GenesisState) Validate() error {
 		}
 		seenAccounts[acc.Address] = true
 	}
+
 	return gs.Params.Validate()
 }

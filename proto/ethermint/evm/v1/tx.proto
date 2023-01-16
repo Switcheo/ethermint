@@ -17,7 +17,6 @@ service Msg {
   };
 }
 
-
 // MsgEthereumTx encapsulates an Ethereum transaction as an SDK message.
 message MsgEthereumTx {
   option (gogoproto.goproto_getters) = false;
