@@ -131,13 +131,10 @@ func (svd Eip712SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx,
 		return next(ctx, tx, simulate)
 	}
 
-	//if is eth signature + cosmos address(signer), convert pubkey from cosmos type to be eth type to allow signature verification to pass
+	// To update pubKey to be eth type as only ethsecp256k1 signature is allowed to pass.
+	// This update is necessary as a merged account would have a secp256k1 pubkey instead.
 	if ethsecp256k1.KeyType == sig.PubKey.Type() {
-		cosmosPubKeyBz := cosmossecp256k1.PubKey{Key: sig.PubKey.Bytes()}
-		correspondingCosmosAddrBz := cosmosPubKeyBz.Address().Bytes()
-		if bytes.Equal(correspondingCosmosAddrBz, signerAddrs[i].Bytes()) {
-			pubKey = &ethsecp256k1.PubKey{Key: pubKey.Bytes()}
-		}
+		pubKey = &ethsecp256k1.PubKey{Key: pubKey.Bytes()}
 	}
 
 	if err := VerifySignature(ctx, pubKey, signerData, sig.Data, svd.signModeHandler, authSignTx); err != nil {
