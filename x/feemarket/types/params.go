@@ -19,6 +19,7 @@ var (
 	ParamStoreKeyMinGasPrice              = []byte("MinGasPrice")
 	ParamStoreKeyMinGasMultiplier         = []byte("MinGasMultiplier")
 	ParamStoreKeyGasLimitPerBlock         = []byte("GasLimitPerBlock")
+	ParamStoreKeyMaxBaseFee               = []byte("MaxBaseFee")
 )
 
 var (
@@ -27,6 +28,8 @@ var (
 	DefaultMinGasPrice      = sdk.NewDec(50_000_000_000_000)
 	DefaultGasLimitPerBlock = sdk.NewInt(10_000_000)
 	DefaultInitialBaseFee   = sdk.NewInt(50_000_000_000_000)
+	// DefaultMaxBaseFee = 5 * 10^19
+	DefaultMaxBaseFee = sdk.NewIntFromBigInt(new(big.Int).Mul(new(big.Int).Exp(big.NewInt(10), big.NewInt(19), nil), big.NewInt(5)))
 )
 
 // ParamKeyTable returns the parameter key table.
@@ -44,6 +47,7 @@ func NewParams(
 	minGasPrice sdk.Dec,
 	minGasPriceMultiplier sdk.Dec,
 	gasLimitPerBlock sdk.Int,
+	maxBaseFee sdk.Int,
 ) Params {
 	return Params{
 		NoBaseFee:                noBaseFee,
@@ -54,6 +58,7 @@ func NewParams(
 		MinGasPrice:              minGasPrice,
 		MinGasMultiplier:         minGasPriceMultiplier,
 		GasLimitPerBlock:         gasLimitPerBlock,
+		MaxBaseFee:               maxBaseFee,
 	}
 }
 
@@ -68,6 +73,7 @@ func DefaultParams() Params {
 		MinGasPrice:              DefaultMinGasPrice,
 		MinGasMultiplier:         DefaultMinGasMultiplier,
 		GasLimitPerBlock:         DefaultGasLimitPerBlock,
+		MaxBaseFee:               DefaultMaxBaseFee,
 	}
 }
 
@@ -82,6 +88,7 @@ func DefaultEthermintTestParams() Params {
 		MinGasPrice:              sdk.ZeroDec(),
 		MinGasMultiplier:         DefaultMinGasMultiplier,
 		GasLimitPerBlock:         DefaultGasLimitPerBlock,
+		MaxBaseFee:               DefaultMaxBaseFee,
 	}
 }
 
@@ -96,6 +103,7 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 		paramtypes.NewParamSetPair(ParamStoreKeyMinGasPrice, &p.MinGasPrice, validateMinGasPrice),
 		paramtypes.NewParamSetPair(ParamStoreKeyMinGasMultiplier, &p.MinGasMultiplier, validateMinGasPrice),
 		paramtypes.NewParamSetPair(ParamStoreKeyGasLimitPerBlock, &p.GasLimitPerBlock, validateGasLimitPerBlock),
+		paramtypes.NewParamSetPair(ParamStoreKeyMaxBaseFee, &p.MaxBaseFee, validateGasLimitPerBlock),
 	}
 }
 
@@ -121,7 +129,11 @@ func (p Params) Validate() error {
 		return err
 	}
 
-	return validateGasLimitPerBlock(p.GasLimitPerBlock)
+	if err := validateGasLimitPerBlock(p.GasLimitPerBlock); err != nil {
+		return err
+	}
+
+	return validateMaxBaseFee(p.MaxBaseFee)
 }
 
 func (p *Params) IsBaseFeeEnabled(height int64) bool {
@@ -230,6 +242,19 @@ func validateGasLimitPerBlock(i interface{}) error {
 
 	if value.IsNegative() {
 		return fmt.Errorf("gas limit per block cannot be negative")
+	}
+
+	return nil
+}
+
+func validateMaxBaseFee(i interface{}) error {
+	value, ok := i.(sdk.Int)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+
+	if value.IsNegative() {
+		return fmt.Errorf("max base fee cannot be negative")
 	}
 
 	return nil

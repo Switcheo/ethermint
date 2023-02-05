@@ -42,4 +42,10 @@ message Params {
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
     (gogoproto.nullable) = false
   ];
+  // Sets the maximum base fee for evm.
+  // Base Fee will not increase pass this value regardless how congested the network is.
+  string max_base_fee = 10 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
 }

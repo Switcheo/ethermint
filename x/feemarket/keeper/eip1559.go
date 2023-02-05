@@ -71,8 +71,8 @@ func (k Keeper) CalculateBaseFee(ctx sdk.Context) *big.Int {
 			x.Div(y, baseFeeChangeDenominator),
 			common.Big1,
 		)
-
-		return x.Add(parentBaseFee, baseFeeDelta)
+		//Takes into account maxBaseFeeParam
+		return math.BigMin(x.Add(parentBaseFee, baseFeeDelta), params.MaxBaseFee.BigInt())
 	}
 
 	// Otherwise if the parent block used less gas than its target, the baseFee
