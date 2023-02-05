@@ -5,6 +5,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/ethereum/go-ethereum/params"
+	"math/big"
 )
 
 var _ paramtypes.ParamSet = &Params{}
@@ -26,7 +27,7 @@ var (
 	// DefaultMinGasMultiplier is 0.5 or 50%
 	DefaultMinGasMultiplier = sdk.NewDecWithPrec(50, 2)
 	DefaultMinGasPrice      = sdk.NewDec(50_000_000_000_000)
-	DefaultGasLimitPerBlock = sdk.NewInt(10_000_000)
+	DefaultGasLimitPerBlock = sdk.NewInt(500_000_000)
 	DefaultInitialBaseFee   = sdk.NewInt(50_000_000_000_000)
 	// DefaultMaxBaseFee = 5 * 10^19
 	DefaultMaxBaseFee = sdk.NewIntFromBigInt(new(big.Int).Mul(new(big.Int).Exp(big.NewInt(10), big.NewInt(19), nil), big.NewInt(5)))
