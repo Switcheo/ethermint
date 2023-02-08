@@ -5,7 +5,6 @@ import (
 	"math/big"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 func (suite *KeeperTestSuite) TestCalculateBaseFee() {
@@ -89,6 +88,7 @@ func (suite *KeeperTestSuite) TestCalculateBaseFee() {
 			params := suite.app.FeeMarketKeeper.GetParams(suite.ctx)
 			params.NoBaseFee = tc.NoBaseFee
 			params.MinGasPrice = tc.minGasPrice
+			params.GasLimitPerBlock = sdk.NewInt(100)
 			suite.app.FeeMarketKeeper.SetParams(suite.ctx, params)
 
 			// Set block height
@@ -96,14 +96,6 @@ func (suite *KeeperTestSuite) TestCalculateBaseFee() {
 
 			// Set parent block gas
 			suite.app.FeeMarketKeeper.SetBlockGasWanted(suite.ctx, tc.parentBlockGasWanted)
-
-			// Set next block target/gasLimit through Consensus Param MaxGas
-			blockParams := abci.BlockParams{
-				MaxGas:   100,
-				MaxBytes: 10,
-			}
-			consParams := abci.ConsensusParams{Block: &blockParams}
-			suite.ctx = suite.ctx.WithConsensusParams(&consParams)
 
 			fee := suite.app.FeeMarketKeeper.CalculateBaseFee(suite.ctx)
 			if tc.NoBaseFee {

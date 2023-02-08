@@ -1,7 +1,10 @@
 package ante
 
 import (
+	"bytes"
 	"fmt"
+	cosmossecp256k1 "github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
+	"github.com/evmos/ethermint/x/evm/keeper"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -18,7 +21,6 @@ import (
 	"github.com/evmos/ethermint/crypto/ethsecp256k1"
 	"github.com/evmos/ethermint/ethereum/eip712"
 	ethermint "github.com/evmos/ethermint/types"
-	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
 var ethermintCodec codec.ProtoCodecMarshaler
@@ -34,13 +36,16 @@ func init() {
 //
 // CONTRACT: Pubkeys are set in context for all signers before this decorator runs
 // CONTRACT: Tx must implement SigVerifiableTx interface
+// Customisation:
+// 1. pubKey type to change to eth type(ethsecp256k1) should there be an eth signature + cosmos signer msg
+// 2. To allow eth signature + cosmos signer to pass the feepayer check
 type Eip712SigVerificationDecorator struct {
-	ak              evmtypes.AccountKeeper
+	ak              AccountKeeper
 	signModeHandler authsigning.SignModeHandler
 }
 
 // NewEip712SigVerificationDecorator creates a new Eip712SigVerificationDecorator
-func NewEip712SigVerificationDecorator(ak evmtypes.AccountKeeper, signModeHandler authsigning.SignModeHandler) Eip712SigVerificationDecorator {
+func NewEip712SigVerificationDecorator(ak AccountKeeper, signModeHandler authsigning.SignModeHandler) Eip712SigVerificationDecorator {
 	return Eip712SigVerificationDecorator{
 		ak:              ak,
 		signModeHandler: signModeHandler,
@@ -109,7 +114,7 @@ func (svd Eip712SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx,
 
 	// retrieve signer data
 	genesis := ctx.BlockHeight() == 0
-	chainID := ctx.ChainID()
+	chainID := keeper.EvmChainId
 
 	var accNum uint64
 	if !genesis {
@@ -126,7 +131,13 @@ func (svd Eip712SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx,
 		return next(ctx, tx, simulate)
 	}
 
-	if err := VerifySignature(pubKey, signerData, sig.Data, svd.signModeHandler, authSignTx); err != nil {
+	// To update pubKey to be eth type as only ethsecp256k1 signature is allowed to pass.
+	// This update is necessary as a merged account would have a secp256k1 pubkey instead.
+	if ethsecp256k1.KeyType == sig.PubKey.Type() {
+		pubKey = &ethsecp256k1.PubKey{Key: pubKey.Bytes()}
+	}
+
+	if err := VerifySignature(ctx, pubKey, signerData, sig.Data, svd.signModeHandler, authSignTx); err != nil {
 		errMsg := fmt.Errorf("signature verification failed; please verify account number (%d) and chain-id (%s): %w", accNum, chainID, err)
 		return ctx, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, errMsg.Error())
 	}
@@ -137,6 +148,7 @@ func (svd Eip712SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx,
 // VerifySignature verifies a transaction signature contained in SignatureData abstracting over different signing modes
 // and single vs multi-signatures.
 func VerifySignature(
+	ctx sdk.Context,
 	pubKey cryptotypes.PubKey,
 	signerData authsigning.SignerData,
 	sigData signing.SignatureData,
@@ -215,7 +227,7 @@ func VerifySignature(
 			FeePayer: feePayer,
 		}
 
-		typedData, err := eip712.WrapTxToTypedData(ethermintCodec, extOpt.TypedDataChainID, msgs[0], txBytes, feeDelegation)
+		typedData, err := eip712.WrapTxToTypedData(ctx, ethermintCodec, extOpt.TypedDataChainID, msgs[0], txBytes, feeDelegation)
 		if err != nil {
 			return sdkerrors.Wrap(err, "failed to pack tx data in EIP712 object")
 		}
@@ -255,7 +267,9 @@ func VerifySignature(
 
 		recoveredFeePayerAcc := sdk.AccAddress(pk.Address().Bytes())
 
-		if !recoveredFeePayerAcc.Equals(feePayer) {
+		cosmosPubkey := cosmossecp256k1.PubKey{Key: pk.Bytes()}
+		//Allow eth signature + cosmos signer(also the fee payer) to bypass this check
+		if !recoveredFeePayerAcc.Equals(feePayer) && !bytes.Equal(cosmosPubkey.Address().Bytes(), feePayer.Bytes()) {
 			return sdkerrors.Wrapf(sdkerrors.ErrorInvalidSigner, "failed to verify delegated fee payer %s signature", recoveredFeePayerAcc)
 		}
 

@@ -19,4 +19,5 @@ type Keeper interface {
 	SetState(ctx sdk.Context, addr common.Address, key common.Hash, value []byte)
 	SetCode(ctx sdk.Context, codeHash []byte, code []byte)
 	DeleteAccount(ctx sdk.Context, addr common.Address) error
+	GetCorrespondingCosmosAddressIfExists(ctx sdk.Context, addr common.Address) sdk.AccAddress
 }

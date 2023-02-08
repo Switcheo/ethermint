@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ethereum/go-ethereum/params"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -10,7 +11,6 @@ import (
 	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/crypto"
 	ethlogger "github.com/ethereum/go-ethereum/eth/tracers/logger"
-	ethparams "github.com/ethereum/go-ethereum/params"
 	"github.com/evmos/ethermint/x/evm/statedb"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -509,8 +509,8 @@ func (suite *KeeperTestSuite) TestEstimateGas() {
 		{"not enough balance", func() {
 			args = types.TransactionArgs{To: &common.Address{}, Value: (*hexutil.Big)(big.NewInt(100))}
 		}, false, 0, false},
-		// should success, enough balance now
-		{"enough balance", func() {
+		// should not success, not enough balance still
+		{"not enough balance", func() {
 			args = types.TransactionArgs{To: &common.Address{}, From: &suite.address, Value: (*hexutil.Big)(big.NewInt(100))}
 		}, false, 0, false},
 		// should success, because gas limit lower than 21000 is ignored
@@ -518,7 +518,7 @@ func (suite *KeeperTestSuite) TestEstimateGas() {
 			args = types.TransactionArgs{To: &common.Address{}, Gas: &gasHelper}
 		}, true, 21000, false},
 		// should fail, invalid gas cap
-		{"gas exceed global allowance", func() {
+		{"gas below global allowance", func() {
 			args = types.TransactionArgs{To: &common.Address{}}
 			gasCap = 20000
 		}, false, 0, false},
@@ -548,13 +548,13 @@ func (suite *KeeperTestSuite) TestEstimateGas() {
 		{"not enough balance w/ enableFeemarket", func() {
 			args = types.TransactionArgs{To: &common.Address{}, Value: (*hexutil.Big)(big.NewInt(100))}
 		}, false, 0, true},
-		{"enough balance w/ enableFeemarket", func() {
+		{"not enough balance w/ enableFeemarket", func() {
 			args = types.TransactionArgs{To: &common.Address{}, From: &suite.address, Value: (*hexutil.Big)(big.NewInt(100))}
 		}, false, 0, true},
 		{"gas exceed allowance w/ enableFeemarket", func() {
 			args = types.TransactionArgs{To: &common.Address{}, Gas: &gasHelper}
 		}, true, 21000, true},
-		{"gas exceed global allowance w/ enableFeemarket", func() {
+		{"gas below global allowance w/ enableFeemarket", func() {
 			args = types.TransactionArgs{To: &common.Address{}}
 			gasCap = 20000
 		}, false, 0, true},
@@ -923,7 +923,7 @@ func (suite *KeeperTestSuite) TestQueryBaseFee() {
 		{
 			"pass - default Base Fee",
 			func() {
-				initialBaseFee := sdk.NewInt(ethparams.InitialBaseFee)
+				initialBaseFee := sdk.NewInt(params.InitialBaseFee)
 				expRes = &types.QueryBaseFeeResponse{BaseFee: &initialBaseFee}
 			},
 			true, true, true,

@@ -413,7 +413,7 @@ func (suite *KeeperTestSuite) TestBaseFee() {
 	}{
 		{"not enable london HF, not enable feemarket", false, false, nil},
 		{"enable london HF, not enable feemarket", true, false, big.NewInt(0)},
-		{"enable london HF, enable feemarket", true, true, big.NewInt(1000000000)},
+		{"enable london HF, enable feemarket", true, true, big.NewInt(params.InitialBaseFee)},
 		{"not enable london HF, enable feemarket", false, true, nil},
 	}
 
@@ -422,7 +422,7 @@ func (suite *KeeperTestSuite) TestBaseFee() {
 			suite.enableFeemarket = tc.enableFeemarket
 			suite.enableLondonHF = tc.enableLondonHF
 			suite.SetupTest()
-			suite.app.EvmKeeper.BeginBlock(suite.ctx, abci.RequestBeginBlock{})
+			suite.app.EvmKeeper.BeginBlock()
 			params := suite.app.EvmKeeper.GetParams(suite.ctx)
 			ethCfg := params.ChainConfig.EthereumConfig(suite.app.EvmKeeper.ChainID())
 			baseFee := suite.app.EvmKeeper.GetBaseFee(suite.ctx, ethCfg)

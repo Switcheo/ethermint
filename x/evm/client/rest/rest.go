@@ -25,9 +25,9 @@ import (
 // RegisterTxRoutes - Central function to define routes that get registered by the main application
 func RegisterTxRoutes(clientCtx client.Context, rtr *mux.Router) {
 	r := clientrest.WithHTTPDeprecationHeaders(rtr)
-	r.HandleFunc("/txs/{hash}", QueryTxRequestHandlerFn(clientCtx)).Methods("GET")
-	r.HandleFunc("/txs", authrest.QueryTxsRequestHandlerFn(clientCtx)).Methods("GET")
-	r.HandleFunc("/txs/decode", authrest.DecodeTxRequestHandlerFn(clientCtx)).Methods("POST")
+	r.HandleFunc("/ethermint/txs/{hash}", QueryTxRequestHandlerFn(clientCtx)).Methods("GET")
+	r.HandleFunc("/ethermint/txs", authrest.QueryTxsRequestHandlerFn(clientCtx)).Methods("GET")
+	r.HandleFunc("/ethermint/txs/decode", authrest.DecodeTxRequestHandlerFn(clientCtx)).Methods("POST")
 }
 
 // QueryTxRequestHandlerFn implements a REST handler that queries a transaction

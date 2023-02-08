@@ -59,15 +59,21 @@ whitespace :=
 whitespace += $(whitespace)
 comma := ,
 build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
+PROJECT_DIR=github.com/evmos/ethermint
+
 
 # process linker flags
 
 ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=ethermint \
+		  -X '${PROJECT_DIR}/x/evm/keeper.EvmChainId=ethermint_9000-1' \
+		  -X '${PROJECT_DIR}/x/evm/types.DefaultEVMDenom=aphoton' \
+		  -X '${PROJECT_DIR}/x/feemarket/types.LocalEthermintRun=true' \
 		  -X github.com/cosmos/cosmos-sdk/version.AppName=$(ETHERMINT_BINARY) \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-			-X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
-			-X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TMVERSION)
+		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
+		  -X github.com/tendermint/tendermint/version.TMCoreSemVer=$(TMVERSION)
+
 
 # DB backend selection
 ifeq (cleveldb,$(findstring cleveldb,$(COSMOS_BUILD_OPTIONS)))
@@ -294,8 +300,12 @@ TEST_TARGETS := test-unit test-unit-cover test-race
 # Test runs-specific rules. To add a new test target, just add
 # a new rule, customise ARGS or TEST_PACKAGES ad libitum, and
 # append the new rule to the TEST_TARGETS list.
-test-unit: ARGS=-timeout=10m -race
+test-unit: ARGS=-timeout=10m -race -ldflags "$(ldflags)"
 test-unit: TEST_PACKAGES=$(PACKAGES_UNIT)
+
+test-path: go.sum
+		GO111MODULE=on go install -mod=readonly -ldflags "$(ldflags)" ./cmd/ethermintd
+		@go test -ldflags "$(ldflags)" $(TESTPATH)
 
 test-race: ARGS=-race
 test-race: TEST_PACKAGES=$(PACKAGES_NOSIMULATION)
@@ -385,6 +395,10 @@ test-sim-benchmark-invariants
 benchmark:
 	@go test -mod=readonly -bench=. $(PACKAGES_NOSIMULATION)
 .PHONY: benchmark
+
+
+update-mock:
+	./scripts/update_mock.sh
 
 ###############################################################################
 ###                                Linting                                  ###

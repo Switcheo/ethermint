@@ -20,6 +20,7 @@ import (
 	rpctypes "github.com/evmos/ethermint/rpc/types"
 	"github.com/evmos/ethermint/server/config"
 	ethermint "github.com/evmos/ethermint/types"
+	"github.com/evmos/ethermint/x/evm/keeper"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/log"
@@ -152,7 +153,7 @@ func NewBackend(
 	allowUnprotectedTxs bool,
 	indexer ethermint.EVMTxIndexer,
 ) *Backend {
-	chainID, err := ethermint.ParseChainID(clientCtx.ChainID)
+	chainID, err := ethermint.ParseChainID(keeper.EvmChainId)
 	if err != nil {
 		panic(err)
 	}
@@ -162,7 +163,7 @@ func NewBackend(
 		panic(err)
 	}
 
-	algos, _ := clientCtx.Keyring.SupportedAlgorithms()
+	algos := hd.SupportedAlgorithms
 	if !algos.Contains(hd.EthSecp256k1) {
 		kr, err := keyring.New(
 			sdk.KeyringServiceName(),

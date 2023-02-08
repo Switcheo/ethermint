@@ -6,7 +6,7 @@ import (
 
 func (suite *KeeperTestSuite) TestSetGetParams() {
 	params := suite.app.FeeMarketKeeper.GetParams(suite.ctx)
-	suite.Require().Equal(types.DefaultParams(), params)
+	suite.Require().Equal(types.DefaultEthermintTestParams(), params)
 	params.ElasticityMultiplier = 3
 	suite.app.FeeMarketKeeper.SetParams(suite.ctx, params)
 	newParams := suite.app.FeeMarketKeeper.GetParams(suite.ctx)

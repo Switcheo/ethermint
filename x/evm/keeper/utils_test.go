@@ -1,12 +1,12 @@
 package keeper_test
 
 import (
+	"github.com/evmos/ethermint/x/feemarket/types"
 	"math/big"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
-	ethparams "github.com/ethereum/go-ethereum/params"
 	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
@@ -220,7 +220,7 @@ func (suite *KeeperTestSuite) TestCheckSenderBalance() {
 			if tc.enableFeemarket {
 				gasFeeCap = tc.gasFeeCap
 				if tc.gasTipCap == nil {
-					gasTipCap = oneInt.BigInt()
+					gasTipCap = big.NewInt(1)
 				} else {
 					gasTipCap = tc.gasTipCap
 				}
@@ -258,7 +258,7 @@ func (suite *KeeperTestSuite) TestDeductTxCostsFromUserBalance() {
 	fiftyInt := sdk.NewInt(50)
 
 	// should be enough to cover all test cases
-	initBalance := sdk.NewInt((ethparams.InitialBaseFee + 10) * 105)
+	initBalance := sdk.NewInt((types.DefaultInitialBaseFee.Int64() + 10) * 105)
 
 	testCases := []struct {
 		name            string
@@ -335,7 +335,7 @@ func (suite *KeeperTestSuite) TestDeductTxCostsFromUserBalance() {
 		{
 			name:            "empty tip fee is valid to deduct",
 			gasLimit:        10,
-			gasFeeCap:       big.NewInt(ethparams.InitialBaseFee),
+			gasFeeCap:       types.DefaultInitialBaseFee.BigInt(),
 			gasTipCap:       big.NewInt(1),
 			cost:            &oneInt,
 			accessList:      &ethtypes.AccessList{},
@@ -345,7 +345,7 @@ func (suite *KeeperTestSuite) TestDeductTxCostsFromUserBalance() {
 		{
 			name:            "effectiveTip equal to gasTipCap",
 			gasLimit:        100,
-			gasFeeCap:       big.NewInt(ethparams.InitialBaseFee + 2),
+			gasFeeCap:       big.NewInt(types.DefaultInitialBaseFee.Int64() + 2),
 			cost:            &oneInt,
 			accessList:      &ethtypes.AccessList{},
 			expectPass:      true,
@@ -354,7 +354,7 @@ func (suite *KeeperTestSuite) TestDeductTxCostsFromUserBalance() {
 		{
 			name:            "effectiveTip equal to (gasFeeCap - baseFee)",
 			gasLimit:        105,
-			gasFeeCap:       big.NewInt(ethparams.InitialBaseFee + 1),
+			gasFeeCap:       big.NewInt(types.DefaultInitialBaseFee.Int64() + 2),
 			gasTipCap:       big.NewInt(2),
 			cost:            &oneInt,
 			accessList:      &ethtypes.AccessList{},
