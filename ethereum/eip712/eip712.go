@@ -43,6 +43,7 @@ func ComputeTypedDataHash(typedData apitypes.TypedData) ([]byte, error) {
 // WrapTxToTypedData is an ultimate method that wraps Amino-encoded Cosmos Tx JSON data
 // into an EIP712-compatible TypedData request.
 func WrapTxToTypedData(
+	ctx sdk.Context,
 	cdc codectypes.AnyUnpacker,
 	chainID uint64,
 	msg sdk.Msg,
@@ -56,11 +57,11 @@ func WrapTxToTypedData(
 	}
 
 	domain := apitypes.TypedDataDomain{
-		Name:              "Cosmos Web3",
+		Name:              "Carbon",
 		Version:           "1.0.0",
 		ChainId:           math.NewHexOrDecimal256(int64(chainID)),
-		VerifyingContract: "cosmos",
-		Salt:              "0",
+		VerifyingContract: ctx.ChainID(),
+		Salt:              "1",
 	}
 
 	msgTypes, err := extractMsgTypes(cdc, "MsgValue", msg)
@@ -300,7 +301,7 @@ func traverseFields(
 		fieldPrefix := fmt.Sprintf("%s.%s", prefix, fieldName)
 
 		ethTyp := typToEth(fieldType)
-		if len(ethTyp) > 0 {
+		if len(ethTyp) > 0 && !removeJsonOmitEmptyFieldFromTypesDefinition(field) {
 			// Support array of uint64
 			if isCollection && fieldType.Kind() != reflect.Slice && fieldType.Kind() != reflect.Array {
 				ethTyp += "[]"
@@ -464,4 +465,12 @@ func doRecover(err *error) {
 
 		*err = fmt.Errorf("%v", r)
 	}
+}
+
+// Removes field from typesData.Types definition if that field will be omitted(json:omitempty) during json unmarshal(WrapTxToTypedData) for signature verification later
+// Requires client signing to be consistent with the removal as well
+// Empty structs are not ignored in omitempty and therefore should still be included in typesData.Types definition
+func removeJsonOmitEmptyFieldFromTypesDefinition(field reflect.Value) bool {
+	return field.IsZero() && field.Kind() != reflect.Struct
+
 }

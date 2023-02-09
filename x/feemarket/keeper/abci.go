@@ -42,7 +42,7 @@ func (k *Keeper) EndBlock(ctx sdk.Context, req abci.RequestEndBlock) {
 		k.Logger(ctx).Error("block gas meter is nil when setting block gas wanted")
 		return
 	}
-
+	// TransientGasWanted tracks the sum of the gas limit of the txs in block
 	gasWanted := k.GetTransientGasWanted(ctx)
 	gasUsed := ctx.BlockGasMeter().GasConsumedToLimit()
 

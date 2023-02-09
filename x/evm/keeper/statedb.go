@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"math/big"
 
 	"github.com/cosmos/cosmos-sdk/store/prefix"
@@ -101,6 +102,7 @@ func (k *Keeper) SetBalance(ctx sdk.Context, addr common.Address, amount *big.In
 }
 
 // SetAccount updates nonce/balance/codeHash together.
+// Additional logic added in this method so that only smart contracts are saved as EthAccount, EOA created will be saved as BaseAccount
 func (k *Keeper) SetAccount(ctx sdk.Context, addr common.Address, account statedb.Account) error {
 	// update account
 	cosmosAddr := sdk.AccAddress(addr.Bytes())
@@ -114,10 +116,22 @@ func (k *Keeper) SetAccount(ctx sdk.Context, addr common.Address, account stated
 	}
 
 	codeHash := common.BytesToHash(account.CodeHash)
+	ethAcct, ok := acct.(ethermint.EthAccountI)
 
-	if ethAcct, ok := acct.(ethermint.EthAccountI); ok {
+	if ok {
 		if err := ethAcct.SetCodeHash(codeHash); err != nil {
 			return err
+		}
+	}
+
+	if !ok && account.IsContract() {
+		if baseAcct, isBaseAccount := acct.(*authtypes.BaseAccount); isBaseAccount {
+			acct = &ethermint.EthAccount{
+				BaseAccount: baseAcct,
+				CodeHash:    codeHash.Hex(),
+			}
+		} else {
+			return sdkerrors.Wrapf(types.ErrInvalidAccount, "type %T, address %s", acct, addr)
 		}
 	}
 
@@ -211,4 +225,9 @@ func (k *Keeper) DeleteAccount(ctx sdk.Context, addr common.Address) error {
 	)
 
 	return nil
+}
+
+// GetCorrespondingCosmosAddressIfExists is a custom method created in evmKeeper for stateDB to query account keeper for cosmos address mapping
+func (k Keeper) GetCorrespondingCosmosAddressIfExists(ctx sdk.Context, addr common.Address) sdk.AccAddress {
+	return k.accountKeeper.GetCorrespondingCosmosAddressIfExists(ctx, addr.Bytes())
 }

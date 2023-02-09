@@ -962,6 +962,8 @@ Params defines the EVM module parameters
 | `base_fee` | [string](#string) |  | base fee for EIP-1559 blocks. |
 | `min_gas_price` | [string](#string) |  | min_gas_price defines the minimum gas price value for cosmos and eth transactions |
 | `min_gas_multiplier` | [string](#string) |  | min gas denominator bounds the minimum gasUsed to be charged to senders based on GasLimit |
+| `gas_limit_per_block` | [string](#string) |  | Sets the max amount of gas per block for EVM tx. This param is created to separate from cosmos consensus block max gas. |
+| `max_base_fee` | [string](#string) |  | Sets the maximum base fee for evm. Base Fee will not increase pass this value regardless how congested the network is. |
 
 
 

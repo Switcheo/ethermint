@@ -36,4 +36,16 @@ message Params {
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
+  // Sets the max amount of gas per block for EVM tx.
+  // This param is created to separate from cosmos consensus block max gas.
+  string gas_limit_per_block = 9 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
+  // Sets the maximum base fee for evm.
+  // Base Fee will not increase pass this value regardless how congested the network is.
+  string max_base_fee = 10 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.nullable) = false
+  ];
 }

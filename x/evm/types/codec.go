@@ -3,17 +3,44 @@ package types
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
+	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
-	proto "github.com/gogo/protobuf/proto"
+	"github.com/gogo/protobuf/proto"
 )
-
-var ModuleCdc = codec.NewProtoCodec(codectypes.NewInterfaceRegistry())
 
 type (
 	ExtensionOptionsEthereumTxI interface{}
 )
+
+var (
+	amino = codec.NewLegacyAmino()
+
+	// ModuleCdc references the global x/market module codec. Note, the codec should
+	// ONLY be used in certain instances of tests and for JSON encoding as Amino is
+	// still used for that purpose.
+	//
+	// The actual codec used for serialization should be provided to x/market and
+	// defined at the application level.
+	ModuleCdc = codec.NewAminoCodec(amino)
+)
+
+func init() {
+	RegisterLegacyAminoCodec(amino)
+	cryptocodec.RegisterCrypto(amino)
+	amino.Seal()
+}
+
+func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
+	cdc.RegisterConcrete(&MsgEthereumTx{}, "evm/v1/MsgEthereumTx", nil)
+	cdc.RegisterConcrete(&ExtensionOptionsEthereumTx{}, "evm/v1/ExtensionOptionsEthereumTx", nil)
+	cdc.RegisterConcrete(&DynamicFeeTx{}, "evm/v1/DynamicFeeTx", nil)
+	cdc.RegisterConcrete(&AccessListTx{}, "evm/v1/AccessListTx", nil)
+	cdc.RegisterConcrete(&LegacyTx{}, "evm/v1/LegacyTx", nil)
+	cdc.RegisterInterface((*ExtensionOptionsEthereumTxI)(nil), nil)
+	cdc.RegisterInterface((*TxData)(nil), nil)
+}
 
 // RegisterInterfaces registers the client interfaces to protobuf Any.
 func RegisterInterfaces(registry codectypes.InterfaceRegistry) {

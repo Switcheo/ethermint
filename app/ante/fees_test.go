@@ -311,7 +311,7 @@ func (s AnteTestSuite) TestEthMinGasPriceDecorator() {
 				feemarketParams.BaseFee = sdk.NewInt(10)
 				s.app.FeeMarketKeeper.SetParams(s.ctx, feemarketParams)
 
-				msg := s.BuildTestEthTx(from, to, nil, make([]byte, 0), nil, big.NewInt(1000), big.NewInt(101), &emptyAccessList)
+				msg := s.BuildTestEthTx(from, to, nil, make([]byte, 0), nil, big.NewInt(100), big.NewInt(101), &emptyAccessList)
 				return s.CreateTestTx(msg, privKey, 1, false)
 			},
 			true,
