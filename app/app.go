@@ -458,7 +458,7 @@ func NewEthermintApp(
 	*/
 	govKeeper := govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.AccountKeeper, app.BankKeeper,
-		app.StakingKeeper, app.MsgServiceRouter(), govConfig, authAddr,
+		app.StakingKeeper, app.MsgServiceRouter(), govConfig, authAddr, getWhitelistedPropMsgs(),
 	)
 
 	app.GovKeeper = *govKeeper.SetHooks(
@@ -882,4 +882,18 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(evmtypes.ModuleName).WithKeyTable(evmtypes.ParamKeyTable()) //nolint: staticcheck
 	paramsKeeper.Subspace(feemarkettypes.ModuleName).WithKeyTable(feemarkettypes.ParamKeyTable())
 	return paramsKeeper
+}
+
+func getWhitelistedPropMsgs() []string {
+	msgs := make([]string, 0)
+
+	msgs = append(msgs, "/cosmos.distribution.v1beta1.MsgCommunityPoolSpend")
+	msgs = append(msgs, "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade")
+	msgs = append(msgs, "/cosmos.upgrade.v1beta1.MsgCancelUpgrade")
+
+	// update params
+	msgs = append(msgs, "/ethermint.feemarket.v1.MsgUpdateParams")
+	msgs = append(msgs, "/ethermint.evm.v1.MsgUpdateParams")
+
+	return msgs
 }

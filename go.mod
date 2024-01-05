@@ -219,7 +219,7 @@ require (
 replace (
 	// use cosmos keyring
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.1.7-0.20210622111912-ef00f8ac3d76
-	github.com/cosmos/cosmos-sdk => github.com/Switcheo/cosmos-sdk v0.47.5-0.20231025082425-23debf2dee6d
+	github.com/cosmos/cosmos-sdk => github.com/Switcheo/cosmos-sdk v0.47.5-0.20240105033212-0b442438aa1c
 	// lock indirect iavl depedency to v0.20 to conform with current cosmos-sdk version
 	github.com/cosmos/iavl => github.com/cosmos/iavl v0.20.0
 
