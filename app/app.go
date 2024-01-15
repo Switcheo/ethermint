@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
@@ -458,7 +459,7 @@ func NewEthermintApp(
 	*/
 	govKeeper := govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.AccountKeeper, app.BankKeeper,
-		app.StakingKeeper, app.MsgServiceRouter(), govConfig, authAddr, getWhitelistedPropMsgs(),
+		app.StakingKeeper, app.MsgServiceRouter(), govConfig, authAddr, app.getWhitelistedPropMsgs(),
 	)
 
 	app.GovKeeper = *govKeeper.SetHooks(
@@ -884,16 +885,19 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	return paramsKeeper
 }
 
-func getWhitelistedPropMsgs() []string {
-	msgs := make([]string, 0)
+func (app *EthermintApp) getWhitelistedPropMsgs() map[string]bool {
+	allMsgs := app.interfaceRegistry.ListImplementations(sdk.MsgInterfaceProtoName)
+	whitelistedMsgs := map[string]bool{
+		"/cosmos.distribution.v1beta1.MsgCommunityPoolSpend": true,
+		"/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade":         true,
+		"/cosmos.upgrade.v1beta1.MsgCancelUpgrade":           true,
+	}
 
-	msgs = append(msgs, "/cosmos.distribution.v1beta1.MsgCommunityPoolSpend")
-	msgs = append(msgs, "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade")
-	msgs = append(msgs, "/cosmos.upgrade.v1beta1.MsgCancelUpgrade")
+	for _, msg := range allMsgs {
+		if strings.HasSuffix(msg, ".MsgUpdateParams") {
+			whitelistedMsgs[msg] = true
+		}
+	}
 
-	// update params
-	msgs = append(msgs, "/ethermint.feemarket.v1.MsgUpdateParams")
-	msgs = append(msgs, "/ethermint.evm.v1.MsgUpdateParams")
-
-	return msgs
+	return whitelistedMsgs
 }
