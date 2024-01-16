@@ -885,17 +885,17 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	return paramsKeeper
 }
 
-func (app *EthermintApp) getWhitelistedPropMsgs() map[string]bool {
+func (app *EthermintApp) getWhitelistedPropMsgs() []string {
 	allMsgs := app.interfaceRegistry.ListImplementations(sdk.MsgInterfaceProtoName)
-	whitelistedMsgs := map[string]bool{
-		"/cosmos.distribution.v1beta1.MsgCommunityPoolSpend": true,
-		"/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade":         true,
-		"/cosmos.upgrade.v1beta1.MsgCancelUpgrade":           true,
+	whitelistedMsgs := []string{
+		"/cosmos.distribution.v1beta1.MsgCommunityPoolSpend",
+		"/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade",
+		"/cosmos.upgrade.v1beta1.MsgCancelUpgrade",
 	}
 
 	for _, msg := range allMsgs {
 		if strings.HasSuffix(msg, ".MsgUpdateParams") {
-			whitelistedMsgs[msg] = true
+			whitelistedMsgs = append(whitelistedMsgs, msg)
 		}
 	}
 
