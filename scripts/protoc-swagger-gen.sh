@@ -18,6 +18,9 @@ for dir in $proto_dirs; do
   fi
 done
 
+# remove OperationID conflicts, see: https://github.com/maxdome/swagger-combine/issues/122#issuecomment-1141400317
+sed -i -e "/^.*\"operationId\":.*$/d" ./tmp-swagger-gen/ethermint/***/**/*.json
+
 # combine swagger files
 # uses nodejs package `swagger-combine`.
 # all the individual swagger files need to be configured in `config.json` for merging
