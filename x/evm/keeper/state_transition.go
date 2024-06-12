@@ -326,8 +326,6 @@ func (k *Keeper) ApplyMessageWithConfig(ctx sdk.Context,
 	// return error if contract creation or call are disabled through governance
 	if !cfg.Params.EnableCreate && msg.To() == nil {
 		return nil, errorsmod.Wrap(types.ErrCreateDisabled, "failed to create new contract")
-	} else if msg.To() != nil {
-		return nil, errorsmod.Wrap(types.ErrCallDisabled, "failed to call contract")
 	}
 
 	stateDB := statedb.New(ctx, k, txConfig)
