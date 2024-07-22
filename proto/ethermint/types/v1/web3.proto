@@ -22,4 +22,8 @@ message ExtensionOptionsWeb3Tx {
   // fee_payer_sig is a signature data from the fee paying account,
   // allows to perform fee delegation when using EIP712 Domain.
   bytes fee_payer_sig = 3 [(gogoproto.jsontag) = "feePayerSig,omitempty"];
+
+  // eip_712_real_chain_id is the real chain id used in EIP712 signature 
+  // when user signs from a different chain 
+  uint64 eip_712_real_chain_id = 4 [(gogoproto.jsontag)= "eip712RealChainID,omitempty", (gogoproto.customname) = "EIP712RealChainID"];
 }
