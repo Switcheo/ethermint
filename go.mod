@@ -1,4 +1,4 @@
-module github.com/evmos/ethermint
+module github.com/wr1159/ethermint
 
 go 1.21
 
