@@ -239,8 +239,8 @@ require (
 replace (
 	// use cosmos keyring
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.1.7-0.20210622111912-ef00f8ac3d76
-	github.com/cometbft/cometbft => github.com/Switcheo/cometbft v0.38.6-0.20240610155832-d947aabd1250
-	github.com/cosmos/cosmos-sdk => github.com/Switcheo/cosmos-sdk v0.50.0-rc.0.0.20240611035703-d45cea2cb0b7
+	github.com/cometbft/cometbft => github.com/Switcheo/cometbft v0.38.6-0.20240722124433-29628c8806a8
+	github.com/cosmos/cosmos-sdk => github.com/Switcheo/cosmos-sdk v0.50.6-0.20240902041920-11e0bbc96faf
 
 	// Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
 	// TODO Remove it: https://github.com/cosmos/cosmos-sdk/issues/10409
