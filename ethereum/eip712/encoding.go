@@ -123,6 +123,8 @@ func decodeAminoSignDoc(signDocBytes []byte) (apitypes.TypedData, error) {
 	memo := aminoDoc.Memo
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "memo:", memo)                         // WRLOG
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "aminoDoc.ChainID:", aminoDoc.ChainID) // WRLOG
+	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "chainID uint64:", chainID.Uint64())   // WRLOG
+	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "ChainID:", chainID)                   // WRLOG
 	// if memo != "" {
 	// 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "Memo exists:") // WRLOG
 	// 	splitMemoCrossChain := strings.Split(memo, "|CROSSCHAIN-SIGNING|")
