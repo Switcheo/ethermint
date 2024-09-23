@@ -18,7 +18,6 @@ package eip712
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
@@ -117,16 +116,10 @@ func decodeAminoSignDoc(signDocBytes []byte) (apitypes.TypedData, error) {
 	if err := validatePayloadMessages(msgs, protoCodec); err != nil {
 		return apitypes.TypedData{}, err
 	}
-
-	chainID, err := types.ParseChainID(aminoDoc.ChainID)
-	if err != nil {
-		return apitypes.TypedData{}, errors.New("invalid chain ID passed as argument")
-	}
 	memo := aminoDoc.Memo
-	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "memo:", memo)                         // WRLOG
-	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "aminoDoc.ChainID:", aminoDoc.ChainID) // WRLOG
-	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "chainID uint64:", chainID.Uint64())   // WRLOG
-	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "ChainID:", chainID)                   // WRLOG
+	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "memo:", memo)                                  // WRLOG
+	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "aminoDoc.ChainID:", aminoDoc.ChainID)          // WRLOG
+	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "right before memo processing:", "===========") // WRLOG
 	var domainID, signedChainID uint64
 	if strings.Contains(memo, "|CROSSCHAIN-SIGNING|") {
 		fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "Memo exists:", memo) // WRLOG
@@ -147,15 +140,18 @@ func decodeAminoSignDoc(signDocBytes []byte) (apitypes.TypedData, error) {
 			fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "fails len(signedChainSplit) != 2 || len(carbonChainSplit) != 2 :", len(signedChainSplit)) // WRLOG
 			return apitypes.TypedData{}, errors.New("invalid memo")
 		}
-		signedChainID, err = strconv.ParseUint(signedChainSplit[1], 10, 64)
-		if err != nil {
-			fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "not okay in parsing", err) // WRLOG
-			return apitypes.TypedData{}, errors.New("invalid signed chain")
-		}
 		fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "signedChainID:", signedChainID) // WRLOG
+		aminoDoc.ChainID = signedChainSplit[1]
+	}
+
+	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "aminoDoc.ChainID:", aminoDoc.ChainID) // WRLOG
+	chainID, err := types.ParseChainID(aminoDoc.ChainID)
+	if err != nil {
+		return apitypes.TypedData{}, errors.New("invalid chain ID passed as argument")
 	}
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "after memo processing:", "===========") // WRLOG
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "chainID uint64:", chainID.Uint64())     // WRLOG
+	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "ChainID:", chainID)                     // WRLOG
 	if signedChainID != 0 {
 		domainID = signedChainID
 	} else {
