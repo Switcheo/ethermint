@@ -199,9 +199,25 @@ func decodeProtobufSignDoc(signDocBytes []byte) (apitypes.TypedData, error) {
 
 	signerInfo := authInfo.SignerInfos[0]
 
+	stdFee := &legacytx.StdFee{
+		Amount: authInfo.Fee.Amount,
+		Gas:    authInfo.Fee.GasLimit,
+	}
+
+	// WrapTxToTypedData expects the payload as an Amino Sign Doc
+	signBytes := legacytx.StdSignBytes(
+		signDoc.ChainId,
+		signDoc.AccountNumber,
+		signerInfo.Sequence,
+		body.TimeoutHeight,
+		*stdFee,
+		msgs,
+		body.Memo,
+	)
 	memo := body.Memo
+
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "memo:", memo)                                  // WRLOG
-	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "aminoDoc.ChainID:", signDoc.ChainId)           // WRLOG
+	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "signDoc.ChainID:", signDoc.ChainId)            // WRLOG
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "right before memo processing:", "===========") // WRLOG
 
 	if strings.Contains(memo, "|CROSSCHAIN-SIGNING|") {
@@ -230,22 +246,6 @@ func decodeProtobufSignDoc(signDocBytes []byte) (apitypes.TypedData, error) {
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "after memo processing:", "===========") // WRLOG
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "chainID uint64:", chainID.Uint64())     // WRLOG
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "ChainID:", chainID)                     // WRLOG
-
-	stdFee := &legacytx.StdFee{
-		Amount: authInfo.Fee.Amount,
-		Gas:    authInfo.Fee.GasLimit,
-	}
-
-	// WrapTxToTypedData expects the payload as an Amino Sign Doc
-	signBytes := legacytx.StdSignBytes(
-		signDoc.ChainId,
-		signDoc.AccountNumber,
-		signerInfo.Sequence,
-		body.TimeoutHeight,
-		*stdFee,
-		msgs,
-		body.Memo,
-	)
 
 	typedData, err := WrapTxToTypedData(
 		chainID.Uint64(),
