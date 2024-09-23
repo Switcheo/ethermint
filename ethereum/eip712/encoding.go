@@ -18,7 +18,7 @@ package eip712
 import (
 	"errors"
 	"fmt"
-	"math/big"
+	"strconv"
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
@@ -127,6 +127,7 @@ func decodeAminoSignDoc(signDocBytes []byte) (apitypes.TypedData, error) {
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "aminoDoc.ChainID:", aminoDoc.ChainID) // WRLOG
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "chainID uint64:", chainID.Uint64())   // WRLOG
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "ChainID:", chainID)                   // WRLOG
+	var domainID, signedChainID uint64
 	if strings.Contains(memo, "|CROSSCHAIN-SIGNING|") {
 		fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "Memo exists:", memo) // WRLOG
 		splitMemoCrossChain := strings.Split(memo, "|CROSSCHAIN-SIGNING|")
@@ -137,25 +138,31 @@ func decodeAminoSignDoc(signDocBytes []byte) (apitypes.TypedData, error) {
 		memoChainIDs := strings.Split(memoSuffix, ";")
 
 		if len(memoChainIDs) != 2 {
+			fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "fails len(memoChainIDs) != 2 :", len(memoChainIDs)) // WRLOG
 			return apitypes.TypedData{}, errors.New("invalid memo")
 		}
 		signedChainSplit := strings.Split(memoChainIDs[0], ":")
 		carbonChainSplit := strings.Split(memoChainIDs[1], ":")
 		if len(signedChainSplit) != 2 || len(carbonChainSplit) != 2 {
+			fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "fails len(signedChainSplit) != 2 || len(carbonChainSplit) != 2 :", len(signedChainSplit)) // WRLOG
 			return apitypes.TypedData{}, errors.New("invalid memo")
 		}
-		signedChainID, ok := new(big.Int).SetString(signedChainSplit[1], 10)
-		if !ok {
+		signedChainID, err = strconv.ParseUint(signedChainSplit[1], 10, 64)
+		if err != nil {
+			fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "not okay in parsing", err) // WRLOG
 			return apitypes.TypedData{}, errors.New("invalid signed chain")
 		}
 		fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "signedChainID:", signedChainID) // WRLOG
-		chainID = signedChainID
 	}
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "after memo processing:", "===========") // WRLOG
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "chainID uint64:", chainID.Uint64())     // WRLOG
-
+	if signedChainID != 0 {
+		domainID = signedChainID
+	} else {
+		domainID = chainID.Uint64()
+	}
 	typedData, err := WrapTxToTypedData(
-		chainID.Uint64(),
+		domainID,
 		signDocBytes,
 	)
 	if err != nil {
