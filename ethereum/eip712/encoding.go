@@ -200,6 +200,10 @@ func decodeProtobufSignDoc(signDocBytes []byte) (apitypes.TypedData, error) {
 	signerInfo := authInfo.SignerInfos[0]
 
 	memo := body.Memo
+	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "memo:", memo)                                  // WRLOG
+	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "aminoDoc.ChainID:", signDoc.ChainId)           // WRLOG
+	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "right before memo processing:", "===========") // WRLOG
+
 	if strings.Contains(memo, "|CROSSCHAIN-SIGNING|") {
 		splitMemoCrossChain := strings.Split(memo, "|CROSSCHAIN-SIGNING|")
 		if len(splitMemoCrossChain) != 2 {
@@ -223,6 +227,9 @@ func decodeProtobufSignDoc(signDocBytes []byte) (apitypes.TypedData, error) {
 	if err != nil {
 		return apitypes.TypedData{}, fmt.Errorf("invalid chain ID passed as argument: %w", err)
 	}
+	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "after memo processing:", "===========") // WRLOG
+	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "chainID uint64:", chainID.Uint64())     // WRLOG
+	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "ChainID:", chainID)                     // WRLOG
 
 	stdFee := &legacytx.StdFee{
 		Amount: authInfo.Fee.Amount,
