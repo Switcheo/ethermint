@@ -18,6 +18,7 @@ package eip712
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
 
@@ -120,6 +121,27 @@ func decodeAminoSignDoc(signDocBytes []byte) (apitypes.TypedData, error) {
 	if err != nil {
 		return apitypes.TypedData{}, errors.New("invalid chain ID passed as argument")
 	}
+	memo := aminoDoc.Memo
+	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "memo:", memo) // WRLOG
+	splitMemoCrossChain := strings.Split(memo, "|CROSSCHAIN-SIGNING|")
+	if len(splitMemoCrossChain) != 2 {
+		return apitypes.TypedData{}, errors.New("invalid memo")
+	}
+	memoSuffix := splitMemoCrossChain[1]
+	memoChainIDs := strings.Split(memoSuffix, ";")
+
+	if len(memoChainIDs) != 2 {
+		return apitypes.TypedData{}, errors.New("invalid memo")
+	}
+	signedChainSplit := strings.Split(memoChainIDs[0], ":")
+	carbonChainSplit := strings.Split(memoChainIDs[1], ":")
+	if len(signedChainSplit) != 2 || len(carbonChainSplit) != 2 {
+		return apitypes.TypedData{}, errors.New("invalid memo")
+	}
+	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "aminoDoc.ChainID:", aminoDoc.ChainID) // WRLOG
+	// if carbonChainSplit[1] != evmkeeper.EvmChainId {
+	// 	return apitypes.TypedData{}, errors.New("invalid chain id")
+	// }
 
 	typedData, err := WrapTxToTypedData(
 		chainID.Uint64(),
