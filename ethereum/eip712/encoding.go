@@ -199,6 +199,26 @@ func decodeProtobufSignDoc(signDocBytes []byte) (apitypes.TypedData, error) {
 
 	signerInfo := authInfo.SignerInfos[0]
 
+	memo := body.Memo
+	if strings.Contains(memo, "|CROSSCHAIN-SIGNING|") {
+		splitMemoCrossChain := strings.Split(memo, "|CROSSCHAIN-SIGNING|")
+		if len(splitMemoCrossChain) != 2 {
+			return apitypes.TypedData{}, errors.New("invalid memo")
+		}
+		memoSuffix := splitMemoCrossChain[1]
+		memoChainIDs := strings.Split(memoSuffix, ";")
+
+		if len(memoChainIDs) != 2 {
+			return apitypes.TypedData{}, errors.New("invalid memo")
+		}
+		signedChainSplit := strings.Split(memoChainIDs[0], ":")
+		carbonChainSplit := strings.Split(memoChainIDs[1], ":")
+		if len(signedChainSplit) != 2 || len(carbonChainSplit) != 2 {
+			return apitypes.TypedData{}, errors.New("invalid memo")
+		}
+		signDoc.ChainId = signedChainSplit[1]
+	}
+
 	chainID, err := types.ParseChainID(signDoc.ChainId)
 	if err != nil {
 		return apitypes.TypedData{}, fmt.Errorf("invalid chain ID passed as argument: %w", err)
