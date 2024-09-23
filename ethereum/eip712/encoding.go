@@ -120,7 +120,6 @@ func decodeAminoSignDoc(signDocBytes []byte) (apitypes.TypedData, error) {
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "memo:", memo)                                  // WRLOG
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "aminoDoc.ChainID:", aminoDoc.ChainID)          // WRLOG
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "right before memo processing:", "===========") // WRLOG
-	var domainID, signedChainID uint64
 	if strings.Contains(memo, "|CROSSCHAIN-SIGNING|") {
 		fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "Memo exists:", memo) // WRLOG
 		splitMemoCrossChain := strings.Split(memo, "|CROSSCHAIN-SIGNING|")
@@ -140,7 +139,6 @@ func decodeAminoSignDoc(signDocBytes []byte) (apitypes.TypedData, error) {
 			fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "fails len(signedChainSplit) != 2 || len(carbonChainSplit) != 2 :", len(signedChainSplit)) // WRLOG
 			return apitypes.TypedData{}, errors.New("invalid memo")
 		}
-		fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "signedChainID:", signedChainID) // WRLOG
 		aminoDoc.ChainID = signedChainSplit[1]
 	}
 
@@ -152,13 +150,8 @@ func decodeAminoSignDoc(signDocBytes []byte) (apitypes.TypedData, error) {
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "after memo processing:", "===========") // WRLOG
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "chainID uint64:", chainID.Uint64())     // WRLOG
 	fmt.Printf("\x1b[37;45;1m%s\x1b[0m\n \x1b[35;1m%v\x1b[0m\n", "ChainID:", chainID)                     // WRLOG
-	if signedChainID != 0 {
-		domainID = signedChainID
-	} else {
-		domainID = chainID.Uint64()
-	}
 	typedData, err := WrapTxToTypedData(
-		domainID,
+		chainID.Uint64(),
 		signDocBytes,
 	)
 	if err != nil {
