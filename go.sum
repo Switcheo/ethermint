@@ -236,8 +236,8 @@ github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 h1:fLjPD/aNc3UIO
 github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6/go.mod h1:3eOhrUMpNV+6aFIbp5/iudMxNCF27Vw2OZgy4xEx0Fg=
 github.com/Switcheo/cometbft v0.38.6-0.20240722124433-29628c8806a8 h1:fUFOV4miyinRQRgdZnTcfmMAyHqbf3B8SVRZehOxhc4=
 github.com/Switcheo/cometbft v0.38.6-0.20240722124433-29628c8806a8/go.mod h1:0tqKin+KQs8zDwzYD8rPHzSBIDNPuB4NrwwGDNb/hUg=
-github.com/Switcheo/cosmos-sdk v0.50.6-0.20240902041920-11e0bbc96faf h1:qqNkyb21YsDphScUbNQkScgHqIltFgHQJyg1pUwIa7s=
-github.com/Switcheo/cosmos-sdk v0.50.6-0.20240902041920-11e0bbc96faf/go.mod h1:GaZy8yDfmrRxp85gK7fJSlmAndwivfMkhiVIjYYiaH4=
+github.com/Switcheo/cosmos-sdk v0.50.6-0.20240929151411-fa16db47233e h1:vZi4iwifp2xC+hKTfWY0+UC54qsFHOkavWx2grGdpCk=
+github.com/Switcheo/cosmos-sdk v0.50.6-0.20240929151411-fa16db47233e/go.mod h1:GaZy8yDfmrRxp85gK7fJSlmAndwivfMkhiVIjYYiaH4=
 github.com/VictoriaMetrics/fastcache v1.6.0 h1:C/3Oi3EiBCqufydp1neRZkqcwmEiuRT9c3fqvvgKm5o=
 github.com/VictoriaMetrics/fastcache v1.6.0/go.mod h1:0qHz5QP0GMX4pfmMA/zt5RgfNuXJrTP0zS7DqpHGGTw=
 github.com/VividCortex/gohistogram v1.0.0 h1:6+hBz+qvs0JOrrNhhmR7lFxo5sINxBCGXrdtl/UvroE=
